@@ -19,6 +19,10 @@ pub struct Configuration {
     pub b: ImageConf,
     pub x: ImageConf,
     pub y: ImageConf,
+    pub up: ImageConf,
+    pub down: ImageConf,
+    pub left: ImageConf,
+    pub right: ImageConf,
     pub start: ImageConf,
     pub analog: AnalogConf,
     pub c: AnalogConf,
@@ -26,4 +30,5 @@ pub struct Configuration {
     pub r_analog: ImageConf,
     pub l_digital: ImageConf,
     pub r_digital: ImageConf,
+    pub z: ImageConf,
 }

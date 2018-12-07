@@ -46,6 +46,26 @@ fn main() {
             dst: (288, 12),
             size: None,
         },
+        up: ImageConf {
+            path: "resources/up.png".into(),
+            dst: (231, 170),
+            size: None,
+        },
+        down: ImageConf {
+            path: "resources/down.png".into(),
+            dst: (231, 205),
+            size: None,
+        },
+        left: ImageConf {
+            path: "resources/left.png".into(),
+            dst: (208, 193),
+            size: None,
+        },
+        right: ImageConf {
+            path: "resources/right.png".into(),
+            dst: (243, 193),
+            size: None,
+        },
         start: ImageConf {
             path: "resources/start.png".into(),
             dst: (298, 188),
@@ -87,6 +107,11 @@ fn main() {
             dst: (472, 220),
             size: None,
         },
+        z: ImageConf {
+            path: "resources/z.png".into(),
+            dst: (442, 17),
+            size: None,
+        },
     };
 
     let state_mutex = Arc::new(Mutex::new(ControllerState::default()));
@@ -100,8 +125,8 @@ fn main() {
 
     //let mut reader = DtmReader::from_path("test.dtm");
     //let mut reader = DtmReader::from_path("Mission_Street_m1_in_146.40.dtm");
-    //let mut reader = DtmReader::from_path("Mission_Street_m3_in_119.10.dtm");
-    let mut reader = DtmReader::from_path("EggQuartersM3_1049_D4.dtm");
+    let mut reader = DtmReader::from_path("Mission_Street_m3_in_119.10.dtm");
+    //let mut reader = DtmReader::from_path("EggQuartersM3_1049_D4.dtm");
     loop {
         let new_state = reader.read_next_input();
         let mut state = state_mutex.lock().unwrap();

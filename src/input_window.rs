@@ -86,6 +86,18 @@ impl InputWindow {
         if state.y {
             self.draw_image(&textures.y);
         }
+        if state.up {
+            self.draw_image(&textures.up);
+        }
+        if state.down {
+            self.draw_image(&textures.down);
+        }
+        if state.left {
+            self.draw_image(&textures.left);
+        }
+        if state.right {
+            self.draw_image(&textures.right);
+        }
         if state.start {
             self.draw_image(&textures.start);
         }
@@ -94,6 +106,9 @@ impl InputWindow {
         }
         if state.r_digital {
             self.draw_image(&textures.r_digital);
+        }
+        if state.z {
+            self.draw_image(&textures.z);
         }
 
         self.draw_analog(&textures.analog, state.analog);
