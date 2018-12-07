@@ -1,0 +1,67 @@
+use sdl2::render::{TextureCreator, Texture, TextureAccess};
+use sdl2::image::LoadTexture;
+use sdl2::rect::Rect;
+
+use crate::configuration::{Configuration, ImageConf};
+
+pub trait TextureCreatorExt {
+    fn texture_cache(&self, _: &Configuration) -> TextureCache;
+}
+
+pub struct Image<'a> {
+    pub tex: Texture<'a>,
+    pub dst: Rect,
+}
+
+pub struct TextureCache<'a> {
+    pub vmu: Texture<'a>,
+    pub background: Image<'a>,
+    pub a: Image<'a>,
+    pub b: Image<'a>,
+    pub x: Image<'a>,
+    pub y: Image<'a>,
+    pub start: Image<'a>,
+}
+
+fn read_image<'a, T>(tex_creator: &'a TextureCreator<T>, conf: &ImageConf) -> Image<'a> {
+    let tex = tex_creator.load_texture(&conf.path).unwrap();
+    let (w, h) = conf.size.unwrap_or_else(|| {
+        let query = tex.query();
+        (query.width, query.height)
+    });
+
+    let dst = Rect::new(conf.dst.0, conf.dst.1, w, h);
+
+    Image {
+        tex: tex,
+        dst: dst,
+    }
+}
+
+impl<T> TextureCreatorExt for TextureCreator<T> {
+    fn texture_cache(&self, conf: &Configuration) -> TextureCache {
+        let vmu = self.create_texture(
+                None,
+                TextureAccess::Target,
+                48,
+                32)
+            .unwrap();
+
+        let background = read_image(self, &conf.background);
+        let a = read_image(self, &conf.a);
+        let b = read_image(self, &conf.b);
+        let x = read_image(self, &conf.x);
+        let y = read_image(self, &conf.y);
+        let start = read_image(self, &conf.start);
+
+        TextureCache {
+            vmu: vmu,
+            background: background,
+            a: a,
+            b: b,
+            x: x,
+            y: y,
+            start: start,
+        }
+    }
+}
