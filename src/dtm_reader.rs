@@ -56,6 +56,10 @@ impl InputReader for DtmReader {
         state.start = current.start;
         state.analog = (current.analog_x, current.analog_y);
         state.c = (current.c_x, current.c_y);
+        state.l_analog = current.l_pressure;
+        state.r_analog = current.r_pressure;
+        state.l_digital = current.l;
+        state.r_digital = current.r;
 
         if self.frame + 1 != self.dtm.controller_data.len() {
             self.frame += 1;

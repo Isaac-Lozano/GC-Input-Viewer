@@ -67,6 +67,26 @@ fn main() {
             },
             range: (34, 34),
         },
+        l_analog: ImageConf {
+            path: "resources/trigger_a.png".into(),
+            dst: (443, 51),
+            size: None,
+        },
+        r_analog: ImageConf {
+            path: "resources/trigger_a.png".into(),
+            dst: (472, 51),
+            size: None,
+        },
+        l_digital: ImageConf {
+            path: "resources/trigger_d.png".into(),
+            dst: (443, 220),
+            size: None,
+        },
+        r_digital: ImageConf {
+            path: "resources/trigger_d.png".into(),
+            dst: (472, 220),
+            size: None,
+        },
     };
 
     let state_mutex = Arc::new(Mutex::new(ControllerState::default()));
@@ -80,7 +100,8 @@ fn main() {
 
     //let mut reader = DtmReader::from_path("test.dtm");
     //let mut reader = DtmReader::from_path("Mission_Street_m1_in_146.40.dtm");
-    let mut reader = DtmReader::from_path("Mission_Street_m3_in_119.10.dtm");
+    //let mut reader = DtmReader::from_path("Mission_Street_m3_in_119.10.dtm");
+    let mut reader = DtmReader::from_path("EggQuartersM3_1049_D4.dtm");
     loop {
         let new_state = reader.read_next_input();
         let mut state = state_mutex.lock().unwrap();

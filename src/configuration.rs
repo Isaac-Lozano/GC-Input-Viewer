@@ -22,4 +22,8 @@ pub struct Configuration {
     pub start: ImageConf,
     pub analog: AnalogConf,
     pub c: AnalogConf,
+    pub l_analog: ImageConf,
+    pub r_analog: ImageConf,
+    pub l_digital: ImageConf,
+    pub r_digital: ImageConf,
 }

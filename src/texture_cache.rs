@@ -28,6 +28,10 @@ pub struct TextureCache<'a> {
     pub start: Image<'a>,
     pub analog: Analog<'a>,
     pub c: Analog<'a>,
+    pub l_analog: Image<'a>,
+    pub r_analog: Image<'a>,
+    pub l_digital: Image<'a>,
+    pub r_digital: Image<'a>,
 }
 
 fn read_image<'a, T>(tex_creator: &'a TextureCreator<T>, conf: &ImageConf) -> Image<'a> {
@@ -71,6 +75,10 @@ impl<T> TextureCreatorExt for TextureCreator<T> {
         let start = read_image(self, &conf.start);
         let a_marker = read_analog(self, &conf.analog);
         let c_marker = read_analog(self, &conf.c);
+        let l_analog = read_image(self, &conf.l_analog);
+        let r_analog = read_image(self, &conf.r_analog);
+        let l_digital = read_image(self, &conf.l_digital);
+        let r_digital = read_image(self, &conf.r_digital);
 
         TextureCache {
             vmu: vmu,
@@ -82,6 +90,10 @@ impl<T> TextureCreatorExt for TextureCreator<T> {
             start: start,
             analog: a_marker,
             c: c_marker,
+            l_analog: l_analog,
+            r_analog: r_analog,
+            l_digital: l_digital,
+            r_digital: r_digital,
         }
     }
 }

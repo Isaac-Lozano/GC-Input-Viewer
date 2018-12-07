@@ -6,6 +6,7 @@ use sdl2::render::Canvas;
 use sdl2::event::Event;
 use sdl2::video::Window;
 use sdl2::pixels::Color;
+use sdl2::rect::Rect;
 use sdl2::Sdl;
 
 use crate::texture_cache::{TextureCreatorExt, TextureCache, Image, Analog};
@@ -55,6 +56,19 @@ impl InputWindow {
         self.canvas.copy(&analog.image.tex, None, dst).unwrap();
     }
 
+    fn draw_trigger(&mut self, image: &Image, value: u8) {
+        let tex_info = image.tex.query();
+        let src_h = ((tex_info.height as f32 * value as f32) / 256.0) as u32;
+        let dst_h = ((image.dst.height() as f32 * value as f32) / 256.0) as u32;
+
+        let src = Rect::new(0, (tex_info.height - src_h) as i32, tex_info.width, src_h);
+        let mut dst = image.dst;
+        dst.set_height(dst_h);
+        dst.offset((image.dst.height() - dst_h) as i32, 0);
+
+        self.canvas.copy(&image.tex, src, dst).unwrap();
+    }
+
     fn update(&mut self, textures: &mut TextureCache, state: ControllerState) {
         self.canvas.set_draw_color(Color::RGB(255, 255, 255));
         self.canvas.clear();
@@ -75,9 +89,18 @@ impl InputWindow {
         if state.start {
             self.draw_image(&textures.start);
         }
+        if state.l_digital {
+            self.draw_image(&textures.l_digital);
+        }
+        if state.r_digital {
+            self.draw_image(&textures.r_digital);
+        }
 
         self.draw_analog(&textures.analog, state.analog);
         self.draw_analog(&textures.c, state.c);
+
+        self.draw_trigger(&textures.l_analog, state.l_analog);
+        self.draw_trigger(&textures.r_analog, state.r_analog);
 
         self.canvas.present();
     }
