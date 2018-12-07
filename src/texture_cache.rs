@@ -2,7 +2,7 @@ use sdl2::render::{TextureCreator, Texture, TextureAccess};
 use sdl2::image::LoadTexture;
 use sdl2::rect::Rect;
 
-use crate::configuration::{Configuration, ImageConf};
+use crate::configuration::{Configuration, ImageConf, AnalogConf};
 
 pub trait TextureCreatorExt {
     fn texture_cache(&self, _: &Configuration) -> TextureCache;
@@ -13,6 +13,11 @@ pub struct Image<'a> {
     pub dst: Rect,
 }
 
+pub struct Analog<'a> {
+    pub image: Image<'a>,
+    pub range: (i32, i32),
+}
+
 pub struct TextureCache<'a> {
     pub vmu: Texture<'a>,
     pub background: Image<'a>,
@@ -21,6 +26,8 @@ pub struct TextureCache<'a> {
     pub x: Image<'a>,
     pub y: Image<'a>,
     pub start: Image<'a>,
+    pub analog: Analog<'a>,
+    pub c: Analog<'a>,
 }
 
 fn read_image<'a, T>(tex_creator: &'a TextureCreator<T>, conf: &ImageConf) -> Image<'a> {
@@ -35,6 +42,15 @@ fn read_image<'a, T>(tex_creator: &'a TextureCreator<T>, conf: &ImageConf) -> Im
     Image {
         tex: tex,
         dst: dst,
+    }
+}
+
+fn read_analog<'a, T>(tex_creator: &'a TextureCreator<T>, conf: &AnalogConf) -> Analog<'a> {
+    let image = read_image(tex_creator, &conf.image);
+
+    Analog {
+        image: image,
+        range: conf.range,
     }
 }
 
@@ -53,6 +69,8 @@ impl<T> TextureCreatorExt for TextureCreator<T> {
         let x = read_image(self, &conf.x);
         let y = read_image(self, &conf.y);
         let start = read_image(self, &conf.start);
+        let a_marker = read_analog(self, &conf.analog);
+        let c_marker = read_analog(self, &conf.c);
 
         TextureCache {
             vmu: vmu,
@@ -62,6 +80,8 @@ impl<T> TextureCreatorExt for TextureCreator<T> {
             x: x,
             y: y,
             start: start,
+            analog: a_marker,
+            c: c_marker,
         }
     }
 }

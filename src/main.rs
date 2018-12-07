@@ -1,20 +1,20 @@
-extern crate sdl2;
-
 mod input_window;
 mod configuration;
 mod texture_cache;
 mod controller_state;
+mod input_reader;
+mod file_reader;
+mod dtm_reader;
 
 use std::thread;
-use std::time::Duration;
-
-use sdl2::event::Event;
-use sdl2::keyboard::Scancode;
+use std::sync::{Arc, Mutex};
 
 use crate::input_window::InputWindow;
-use crate::texture_cache::TextureCreatorExt;
-use crate::configuration::{Configuration, ImageConf};
+use crate::configuration::{Configuration, ImageConf, AnalogConf};
 use crate::controller_state::ControllerState;
+use crate::input_reader::InputReader;
+use crate::file_reader::FileReader;
+use crate::dtm_reader::DtmReader;
 
 fn main() {
     println!("Hello, world!");
@@ -51,38 +51,41 @@ fn main() {
             dst: (298, 188),
             size: None,
         },
+        analog: AnalogConf {
+            image: ImageConf {
+                path: "resources/analog_marker.png".into(),
+                dst: (96, 113),
+                size: None,
+            },
+            range: (96, 96),
+        },
+        c: AnalogConf {
+            image: ImageConf {
+                path: "resources/c_marker.png".into(),
+                dst: (380, 197),
+                size: None,
+            },
+            range: (34, 34),
+        },
     };
 
-    let sdl = sdl2::init().unwrap();
+    let state_mutex = Arc::new(Mutex::new(ControllerState::default()));
 
-    let mut iw = InputWindow::new(sdl.video().unwrap(), &conf).unwrap();
-    let tex_creator = iw.texture_creator();
-    let mut tex = tex_creator.texture_cache(&conf);
+    let conf_copy = conf.clone();
+    let state_mutex_copy = state_mutex.clone();
+    let child = thread::spawn(move || {
+        let mut iw = InputWindow::new(&conf_copy, state_mutex_copy).unwrap();
+        iw.run(conf_copy);
+    });
 
-    let mut event_pump = sdl.event_pump().unwrap();
-    'running: loop {
-        let mut state = ControllerState::default();
-
-        for event in event_pump.poll_iter() {
-            match event {
-                Event::Quit {..} =>
-                    break 'running,
-                _ => {}
-            }
-        }
-
-        let kb = event_pump.keyboard_state();
-
-        state.a = kb.is_scancode_pressed(Scancode::A);
-        state.b = kb.is_scancode_pressed(Scancode::B);
-        state.x = kb.is_scancode_pressed(Scancode::X);
-        state.y = kb.is_scancode_pressed(Scancode::Y);
-        state.start = kb.is_scancode_pressed(Scancode::Space);
-
-        iw.update(&mut tex, state);
-
-        thread::sleep(Duration::new(0, 1_000_000_000u32 / 60));
+    //let mut reader = DtmReader::from_path("test.dtm");
+    //let mut reader = DtmReader::from_path("Mission_Street_m1_in_146.40.dtm");
+    let mut reader = DtmReader::from_path("Mission_Street_m3_in_119.10.dtm");
+    loop {
+        let new_state = reader.read_next_input();
+        let mut state = state_mutex.lock().unwrap();
+        *state = new_state;
     }
 
-    println!("Hello, world!");
+    child.join().unwrap();
 }

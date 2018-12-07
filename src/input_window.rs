@@ -1,19 +1,28 @@
-use sdl2::render::{Canvas, TextureCreator};
-use sdl2::video::{Window, WindowContext};
-use sdl2::pixels::Color;
-use sdl2::rect::{Rect, Point};
-use sdl2::VideoSubsystem;
+use std::thread;
+use std::time::Duration;
+use std::sync::{Arc, Mutex};
 
-use crate::texture_cache::{TextureCache, Image};
+use sdl2::render::Canvas;
+use sdl2::event::Event;
+use sdl2::video::Window;
+use sdl2::pixels::Color;
+use sdl2::Sdl;
+
+use crate::texture_cache::{TextureCreatorExt, TextureCache, Image, Analog};
 use crate::controller_state::ControllerState;
 use crate::configuration::Configuration;
 
 pub struct InputWindow {
+    sdl: Sdl,
     canvas: Canvas<Window>,
+    state: Arc<Mutex<ControllerState>>,
 }
 
 impl InputWindow {
-    pub fn new(video: VideoSubsystem, conf: &Configuration) -> Result<InputWindow, String> {
+    pub fn new(conf: &Configuration, state: Arc<Mutex<ControllerState>>) -> Result<InputWindow, String> {
+        let sdl = sdl2::init().unwrap();
+        let video = sdl.video().unwrap();
+
         let window = video.window("GC Input Viewer", conf.size.0, conf.size.1)
             .position_centered()
             .build()
@@ -26,19 +35,27 @@ impl InputWindow {
             .unwrap();
 
         Ok(InputWindow{
+            sdl: sdl,
             canvas: canvas,
+            state: state,
         })
-    }
-
-    pub fn texture_creator(&self) -> TextureCreator<WindowContext> {
-        self.canvas.texture_creator()
     }
 
     fn draw_image(&mut self, image: &Image) {
         self.canvas.copy(&image.tex, None, image.dst).unwrap();
     }
 
-    pub fn update(&mut self, textures: &mut TextureCache, state: ControllerState) {
+    fn draw_analog(&mut self, analog: &Analog, position: (u8, u8)) {
+        let xoffset = ((position.0 as f32 / 256.0) * 2.0 * analog.range.0 as f32) as i32;
+        let yoffset = ((position.1 as f32 / 256.0) * 2.0 * analog.range.1 as f32) as i32;
+
+        let mut dst = analog.image.dst.clone();
+        dst.offset(xoffset - analog.range.0, analog.range.1 - yoffset);
+
+        self.canvas.copy(&analog.image.tex, None, dst).unwrap();
+    }
+
+    fn update(&mut self, textures: &mut TextureCache, state: ControllerState) {
         self.canvas.set_draw_color(Color::RGB(255, 255, 255));
         self.canvas.clear();
 
@@ -59,6 +76,31 @@ impl InputWindow {
             self.draw_image(&textures.start);
         }
 
+        self.draw_analog(&textures.analog, state.analog);
+        self.draw_analog(&textures.c, state.c);
+
         self.canvas.present();
+    }
+
+    pub fn run(&mut self, conf: Configuration) {
+        let tex_creator = self.canvas.texture_creator();
+        let mut tex = tex_creator.texture_cache(&conf);
+
+        let mut event_pump = self.sdl.event_pump().unwrap();
+        'running: loop {
+
+            for event in event_pump.poll_iter() {
+                match event {
+                    Event::Quit {..} =>
+                        break 'running,
+                    _ => {}
+                }
+            }
+
+            let state = *self.state.lock().unwrap();
+            self.update(&mut tex, state);
+
+            thread::sleep(Duration::new(0, 1_000_000_000u32 / 60));
+        }
     }
 }
