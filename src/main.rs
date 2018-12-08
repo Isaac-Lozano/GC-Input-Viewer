@@ -5,6 +5,7 @@ mod controller_state;
 mod input_reader;
 mod file_reader;
 mod dtm_reader;
+mod serial_reader;
 
 use std::thread;
 use std::sync::{Arc, Mutex};
@@ -15,6 +16,7 @@ use crate::controller_state::ControllerState;
 use crate::input_reader::InputReader;
 use crate::file_reader::FileReader;
 use crate::dtm_reader::DtmReader;
+use crate::serial_reader::SerialReader;
 
 fn main() {
     println!("Hello, world!");
@@ -125,8 +127,9 @@ fn main() {
 
     //let mut reader = DtmReader::from_path("test.dtm");
     //let mut reader = DtmReader::from_path("Mission_Street_m1_in_146.40.dtm");
-    let mut reader = DtmReader::from_path("Mission_Street_m3_in_119.10.dtm");
+    //let mut reader = DtmReader::from_path("Mission_Street_m3_in_119.10.dtm");
     //let mut reader = DtmReader::from_path("EggQuartersM3_1049_D4.dtm");
+    let mut reader = SerialReader::from_path("/dev/ttyUSB0");
     loop {
         let new_state = reader.read_next_input();
         let mut state = state_mutex.lock().unwrap();

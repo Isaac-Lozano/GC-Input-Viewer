@@ -6,6 +6,7 @@ edition = "2018"
 
 [dependencies]
 dtm2txt = {path = "../dtm2txt"}
+serialport = "3.1.0"
 
 [dependencies.sdl2]
 version = "0.31.0"
