@@ -32,3 +32,7 @@ pub struct Configuration {
     pub r_digital: ImageConf,
     pub z: ImageConf,
 }
+
+pub trait ConfigReader {
+    fn read_config(&mut self) -> Configuration;
+}

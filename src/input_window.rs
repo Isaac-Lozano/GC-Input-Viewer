@@ -64,7 +64,7 @@ impl InputWindow {
         let src = Rect::new(0, (tex_info.height - src_h) as i32, tex_info.width, src_h);
         let mut dst = image.dst;
         dst.set_height(dst_h);
-        dst.offset((image.dst.height() - dst_h) as i32, 0);
+        dst.offset(0, (image.dst.height() - dst_h) as i32);
 
         self.canvas.copy(&image.tex, src, dst).unwrap();
     }

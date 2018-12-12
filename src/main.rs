@@ -129,7 +129,7 @@ fn main() {
     //let mut reader = DtmReader::from_path("Mission_Street_m1_in_146.40.dtm");
     //let mut reader = DtmReader::from_path("Mission_Street_m3_in_119.10.dtm");
     //let mut reader = DtmReader::from_path("EggQuartersM3_1049_D4.dtm");
-    let mut reader = SerialReader::from_path("/dev/ttyUSB0");
+    let mut reader = SerialReader::from_path("COM11");
     loop {
         let new_state = reader.read_next_input();
         let mut state = state_mutex.lock().unwrap();
