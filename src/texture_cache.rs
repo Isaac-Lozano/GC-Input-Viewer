@@ -1,12 +1,9 @@
-use sdl2::render::{TextureCreator, Texture, TextureAccess};
+use sdl2::render::{Canvas, TextureCreator, Texture, TextureAccess};
 use sdl2::image::LoadTexture;
 use sdl2::rect::Rect;
+use sdl2::video::{Window, WindowContext};
 
 use crate::configuration::{Configuration, ImageConf, AnalogConf};
-
-pub trait TextureCreatorExt {
-    fn texture_cache(&self, _: &Configuration) -> TextureCache;
-}
 
 pub struct Image<'a> {
     pub tex: Texture<'a>,
@@ -19,7 +16,6 @@ pub struct Analog<'a> {
 }
 
 pub struct TextureCache<'a> {
-    pub vmu: Texture<'a>,
     pub background: Image<'a>,
     pub a: Image<'a>,
     pub b: Image<'a>,
@@ -39,59 +35,56 @@ pub struct TextureCache<'a> {
     pub z: Image<'a>,
 }
 
-fn read_image<'a, T>(tex_creator: &'a TextureCreator<T>, conf: &ImageConf) -> Image<'a> {
-    let tex = tex_creator.load_texture(&conf.path).unwrap();
-    let (w, h) = conf.size.unwrap_or_else(|| {
-        let query = tex.query();
-        (query.width, query.height)
-    });
-
-    let dst = Rect::new(conf.dst.0, conf.dst.1, w, h);
-
-    Image {
-        tex: tex,
-        dst: dst,
-    }
+pub struct TextureCacheCreator<T> {
+    path: String,
+    tex_creator: TextureCreator<T>,
 }
 
-fn read_analog<'a, T>(tex_creator: &'a TextureCreator<T>, conf: &AnalogConf) -> Analog<'a> {
-    let image = read_image(tex_creator, &conf.image);
+impl<T> TextureCacheCreator<T> {
+    fn read_image<'a>(&'a self, conf: &ImageConf) -> Image<'a> {
+        let tex = self.tex_creator.load_texture(&conf.path).unwrap();
+        let (w, h) = conf.size.unwrap_or_else(|| {
+            let query = tex.query();
+            (query.width, query.height)
+        });
 
-    Analog {
-        image: image,
-        range: conf.range,
+        let dst = Rect::new(conf.dst.0, conf.dst.1, w, h);
+
+        Image {
+            tex: tex,
+            dst: dst,
+        }
     }
-}
 
-impl<T> TextureCreatorExt for TextureCreator<T> {
-    fn texture_cache(&self, conf: &Configuration) -> TextureCache {
-        let vmu = self.create_texture(
-                None,
-                TextureAccess::Target,
-                48,
-                32)
-            .unwrap();
+    fn read_analog<'a>(&'a self, conf: &AnalogConf) -> Analog<'a> {
+        let image = self.read_image(&conf.image);
 
-        let background = read_image(self, &conf.background);
-        let a = read_image(self, &conf.a);
-        let b = read_image(self, &conf.b);
-        let x = read_image(self, &conf.x);
-        let y = read_image(self, &conf.y);
-        let up = read_image(self, &conf.up);
-        let down = read_image(self, &conf.down);
-        let left = read_image(self, &conf.left);
-        let right = read_image(self, &conf.right);
-        let start = read_image(self, &conf.start);
-        let a_marker = read_analog(self, &conf.analog);
-        let c_marker = read_analog(self, &conf.c);
-        let l_analog = read_image(self, &conf.l_analog);
-        let r_analog = read_image(self, &conf.r_analog);
-        let l_digital = read_image(self, &conf.l_digital);
-        let r_digital = read_image(self, &conf.r_digital);
-        let z = read_image(self, &conf.z);
+        Analog {
+            image: image,
+            range: conf.range,
+        }
+    }
+
+    pub fn texture_cache(&self, conf: &Configuration) -> TextureCache {
+        let background = self.read_image(&conf.background);
+        let a = self.read_image(&conf.a);
+        let b = self.read_image(&conf.b);
+        let x = self.read_image(&conf.x);
+        let y = self.read_image(&conf.y);
+        let up = self.read_image(&conf.up);
+        let down = self.read_image(&conf.down);
+        let left = self.read_image(&conf.left);
+        let right = self.read_image(&conf.right);
+        let start = self.read_image(&conf.start);
+        let a_marker = self.read_analog(&conf.analog);
+        let c_marker = self.read_analog(&conf.c);
+        let l_analog = self.read_image(&conf.l_analog);
+        let r_analog = self.read_image(&conf.r_analog);
+        let l_digital = self.read_image(&conf.l_digital);
+        let r_digital = self.read_image(&conf.r_digital);
+        let z = self.read_image(&conf.z);
 
         TextureCache {
-            vmu: vmu,
             background: background,
             a: a,
             b: b,
@@ -109,6 +102,21 @@ impl<T> TextureCreatorExt for TextureCreator<T> {
             l_digital: l_digital,
             r_digital: r_digital,
             z: z,
+        }
+    }
+}
+
+pub trait CanvasExt<T> {
+    fn texture_cache_creator(&self, path: String) -> TextureCacheCreator<T>;
+}
+
+impl CanvasExt<WindowContext> for Canvas<Window> {
+    fn texture_cache_creator(&self, path: String) -> TextureCacheCreator<WindowContext> {
+        let tex_creator = self.texture_creator();
+
+        TextureCacheCreator {
+            path: path,
+            tex_creator: tex_creator,
         }
     }
 }

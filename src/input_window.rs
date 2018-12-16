@@ -9,7 +9,7 @@ use sdl2::pixels::Color;
 use sdl2::rect::Rect;
 use sdl2::Sdl;
 
-use crate::texture_cache::{TextureCreatorExt, TextureCache, Image, Analog};
+use crate::texture_cache::{CanvasExt, TextureCache, Image, Analog};
 use crate::controller_state::ControllerState;
 use crate::configuration::Configuration;
 
@@ -121,8 +121,8 @@ impl InputWindow {
     }
 
     pub fn run(&mut self, conf: Configuration) {
-        let tex_creator = self.canvas.texture_creator();
-        let mut tex = tex_creator.texture_cache(&conf);
+        let tex_cache_creator = self.canvas.texture_cache_creator("".into());
+        let mut tex = tex_cache_creator.texture_cache(&conf);
 
         let mut event_pump = self.sdl.event_pump().unwrap();
         'running: loop {
