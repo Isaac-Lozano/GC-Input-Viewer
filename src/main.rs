@@ -8,7 +8,7 @@ use std::thread;
 use std::sync::{Arc, Mutex};
 
 use crate::input_window::InputWindow;
-use crate::configuration::{Configuration, ConfigReader, ImageConf, AnalogConf};
+use crate::configuration::ConfigReader;
 use crate::configuration::json_config::JsonConfig;
 use crate::controller_state::ControllerState;
 use crate::input_reader::InputReader;
