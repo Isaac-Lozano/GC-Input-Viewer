@@ -114,7 +114,7 @@ fn main() {
 //        }
 //    };
 
-    let mut conf_reader = JsonConfig::from_path("onvar_theme.json");
+    let mut conf_reader = JsonConfig::from_path("resources/onvar_theme.json");
 
     let conf = conf_reader.read_config();
     let base = conf_reader.get_path_base();
