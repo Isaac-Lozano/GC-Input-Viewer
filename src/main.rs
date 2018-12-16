@@ -117,6 +117,7 @@ fn main() {
     let mut conf_reader = JsonConfig::from_path("onvar_theme.json");
 
     let conf = conf_reader.read_config();
+    let base = conf_reader.get_path_base();
 
     let state_mutex = Arc::new(Mutex::new(ControllerState::default()));
 
@@ -124,7 +125,7 @@ fn main() {
     let state_mutex_copy = state_mutex.clone();
     let child = thread::spawn(move || {
         let mut iw = InputWindow::new(&conf_copy, state_mutex_copy).unwrap();
-        iw.run(conf_copy);
+        iw.run(base, conf_copy);
     });
 
     //let mut reader = DtmReader::from_path("test.dtm");

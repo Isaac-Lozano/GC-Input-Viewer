@@ -1,6 +1,7 @@
 use std::thread;
 use std::time::Duration;
 use std::sync::{Arc, Mutex};
+use std::path::PathBuf;
 
 use sdl2::render::Canvas;
 use sdl2::event::Event;
@@ -120,8 +121,8 @@ impl InputWindow {
         self.canvas.present();
     }
 
-    pub fn run(&mut self, conf: Configuration) {
-        let tex_cache_creator = self.canvas.texture_cache_creator("".into());
+    pub fn run(&mut self, base: PathBuf, conf: Configuration) {
+        let tex_cache_creator = self.canvas.texture_cache_creator(base);
         let mut tex = tex_cache_creator.texture_cache(&conf);
 
         let mut event_pump = self.sdl.event_pump().unwrap();

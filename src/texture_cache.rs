@@ -1,3 +1,5 @@
+use std::path::{Path, PathBuf};
+
 use sdl2::render::{Canvas, TextureCreator, Texture, TextureAccess};
 use sdl2::image::LoadTexture;
 use sdl2::rect::Rect;
@@ -36,13 +38,14 @@ pub struct TextureCache<'a> {
 }
 
 pub struct TextureCacheCreator<T> {
-    path: String,
+    path: PathBuf,
     tex_creator: TextureCreator<T>,
 }
 
 impl<T> TextureCacheCreator<T> {
     fn read_image<'a>(&'a self, conf: &ImageConf) -> Image<'a> {
-        let tex = self.tex_creator.load_texture(&conf.path).unwrap();
+        let final_path = self.path.join(&conf.path);
+        let tex = self.tex_creator.load_texture(final_path).unwrap();
         let (w, h) = conf.size.unwrap_or_else(|| {
             let query = tex.query();
             (query.width, query.height)
@@ -107,15 +110,19 @@ impl<T> TextureCacheCreator<T> {
 }
 
 pub trait CanvasExt<T> {
-    fn texture_cache_creator(&self, path: String) -> TextureCacheCreator<T>;
+    fn texture_cache_creator<P>(&self, path: P) -> TextureCacheCreator<T>
+        where P: AsRef<Path>;
 }
 
 impl CanvasExt<WindowContext> for Canvas<Window> {
-    fn texture_cache_creator(&self, path: String) -> TextureCacheCreator<WindowContext> {
+    fn texture_cache_creator<P>(&self, path: P) -> TextureCacheCreator<WindowContext>
+        where P: AsRef<Path>,
+    {
         let tex_creator = self.texture_creator();
 
         TextureCacheCreator {
-            path: path,
+            // TODO: I want Path to clone and PathBuf to move.
+            path: path.as_ref().to_owned(),
             tex_creator: tex_creator,
         }
     }

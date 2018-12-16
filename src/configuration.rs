@@ -1,6 +1,8 @@
 pub mod static_config;
 pub mod json_config;
 
+use std::path::PathBuf;
+
 use serde_derive::Deserialize;
 
 #[derive(Clone, Deserialize)]
@@ -40,4 +42,5 @@ pub struct Configuration {
 
 pub trait ConfigReader {
     fn read_config(&mut self) -> Configuration;
+    fn get_path_base(&mut self) -> PathBuf;
 }
