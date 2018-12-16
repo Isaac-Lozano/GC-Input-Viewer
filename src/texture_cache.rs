@@ -1,6 +1,6 @@
 use std::path::{Path, PathBuf};
 
-use sdl2::render::{Canvas, TextureCreator, Texture, TextureAccess};
+use sdl2::render::{Canvas, TextureCreator, Texture};
 use sdl2::image::LoadTexture;
 use sdl2::rect::Rect;
 use sdl2::video::{Window, WindowContext};
