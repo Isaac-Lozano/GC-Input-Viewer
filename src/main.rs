@@ -12,9 +12,7 @@ use crate::configuration::{Configuration, ConfigReader, ImageConf, AnalogConf};
 use crate::configuration::static_config::StaticConfig;
 use crate::controller_state::ControllerState;
 use crate::input_reader::InputReader;
-use crate::input_reader::file_reader::FileReader;
 use crate::input_reader::dtm_reader::DtmReader;
-use crate::input_reader::serial_reader::SerialReader;
 
 fn main() {
     println!("Hello, world!");
@@ -130,7 +128,7 @@ fn main() {
     //let mut reader = DtmReader::from_path("test.dtm");
     //let mut reader = DtmReader::from_path("Mission_Street_m1_in_146.40.dtm");
     //let mut reader = DtmReader::from_path("Mission_Street_m3_in_119.10.dtm");
-    let mut reader = DtmReader::from_path("EggQuartersM3_1049_D4.dtm");
+    let mut reader = DtmReader::from_path("/home/onvar/Documents/sa2/tas/EggQuartersM3_1049_D4.dtm");
     //let mut reader = SerialReader::from_path("COM11");
     loop {
         let new_state = reader.read_next_input();
