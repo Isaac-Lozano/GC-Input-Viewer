@@ -1,0 +1,78 @@
+{
+    "size": [512, 256],
+    "background": {
+        "path": "resources/background.png",
+        "dst": [0, 0]
+    },
+    "a": {
+        "path": "resources/a.png",
+        "dst": [302, 59]
+    },
+    "b": {
+        "path": "resources/b.png",
+        "dst": [245, 110]
+    },
+    "x": {
+        "path": "resources/x.png",
+        "dst": [348, 50]
+    },
+    "y": {
+        "path": "resources/y.png",
+        "dst": [288, 12]
+    },
+    "up": {
+        "path": "resources/up.png",
+        "dst": [231, 170]
+    },
+    "down": {
+        "path": "resources/down.png",
+        "dst": [231, 205]
+    },
+    "left": {
+        "path": "resources/left.png",
+        "dst": [208, 193]
+    },
+    "right": {
+        "path": "resources/right.png",
+        "dst": [243, 193]
+    },
+    "start": {
+        "path": "resources/start.png",
+        "dst": [298, 188]
+    },
+    "analog": {
+        "image": {
+            "path": "resources/analog_marker.png",
+            "dst": [96, 113]
+        },
+        "range": [96, 96]
+    },
+    "c": {
+        "image": {
+            "path": "resources/c_marker.png",
+            "dst": [380, 197]
+        },
+        "range": [34, 34]
+    },
+    "l_analog": {
+        "path": "resources/trigger_a.png",
+        "dst": [443, 51]
+    },
+    "r_analog": {
+        "path": "resources/trigger_a.png",
+        "dst": [472, 51]
+    },
+    "l_digital": {
+        "path": "resources/trigger_d.png",
+        "dst": [443, 220]
+    },
+    "r_digital": {
+        "path": "resources/trigger_d.png",
+        "dst": [472, 220]
+    },
+    "z": {
+        "path": "resources/z.png",
+        "dst": [442, 17]
+    }
+}
+

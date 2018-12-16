@@ -1,19 +1,22 @@
 pub mod static_config;
+pub mod json_config;
 
-#[derive(Clone)]
+use serde_derive::Deserialize;
+
+#[derive(Clone, Deserialize)]
 pub struct ImageConf {
     pub path: String,
     pub dst: (i32, i32),
     pub size: Option<(u32, u32)>,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Deserialize)]
 pub struct AnalogConf {
     pub image: ImageConf,
     pub range: (i32, i32),
 }
 
-#[derive(Clone)]
+#[derive(Clone, Deserialize)]
 pub struct Configuration {
     pub size: (u32, u32),
     pub background: ImageConf,

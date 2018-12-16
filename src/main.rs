@@ -9,7 +9,7 @@ use std::sync::{Arc, Mutex};
 
 use crate::input_window::InputWindow;
 use crate::configuration::{Configuration, ConfigReader, ImageConf, AnalogConf};
-use crate::configuration::static_config::StaticConfig;
+use crate::configuration::json_config::JsonConfig;
 use crate::controller_state::ControllerState;
 use crate::input_reader::InputReader;
 use crate::input_reader::dtm_reader::DtmReader;
@@ -17,102 +17,104 @@ use crate::input_reader::dtm_reader::DtmReader;
 fn main() {
     println!("Hello, world!");
 
-    let mut conf_reader = StaticConfig {
-        conf: Configuration {
-            size: (512, 256),
-            background: ImageConf {
-                path: "resources/background.png".into(),
-                dst: (0, 0),
-                size: None,
-            },
-            a: ImageConf {
-                path: "resources/a.png".into(),
-                dst: (302, 59),
-                size: None,
-            },
-            b: ImageConf {
-                path: "resources/b.png".into(),
-                dst: (245, 110),
-                size: None,
-            },
-            x: ImageConf {
-                path: "resources/x.png".into(),
-                dst: (384, 50),
-                size: None,
-            },
-            y: ImageConf {
-                path: "resources/y.png".into(),
-                dst: (288, 12),
-                size: None,
-            },
-            up: ImageConf {
-                path: "resources/up.png".into(),
-                dst: (231, 170),
-                size: None,
-            },
-            down: ImageConf {
-                path: "resources/down.png".into(),
-                dst: (231, 205),
-                size: None,
-            },
-            left: ImageConf {
-                path: "resources/left.png".into(),
-                dst: (208, 193),
-                size: None,
-            },
-            right: ImageConf {
-                path: "resources/right.png".into(),
-                dst: (243, 193),
-                size: None,
-            },
-            start: ImageConf {
-                path: "resources/start.png".into(),
-                dst: (298, 188),
-                size: None,
-            },
-            analog: AnalogConf {
-                image: ImageConf {
-                    path: "resources/analog_marker.png".into(),
-                    dst: (96, 113),
-                    size: None,
-                },
-                range: (96, 96),
-            },
-            c: AnalogConf {
-                image: ImageConf {
-                    path: "resources/c_marker.png".into(),
-                    dst: (380, 197),
-                    size: None,
-                },
-                range: (34, 34),
-            },
-            l_analog: ImageConf {
-                path: "resources/trigger_a.png".into(),
-                dst: (443, 51),
-                size: None,
-            },
-            r_analog: ImageConf {
-                path: "resources/trigger_a.png".into(),
-                dst: (472, 51),
-                size: None,
-            },
-            l_digital: ImageConf {
-                path: "resources/trigger_d.png".into(),
-                dst: (443, 220),
-                size: None,
-            },
-            r_digital: ImageConf {
-                path: "resources/trigger_d.png".into(),
-                dst: (472, 220),
-                size: None,
-            },
-            z: ImageConf {
-                path: "resources/z.png".into(),
-                dst: (442, 17),
-                size: None,
-            },
-        }
-    };
+//    let mut conf_reader = StaticConfig {
+//        conf: Configuration {
+//            size: (512, 256),
+//            background: ImageConf {
+//                path: "resources/background.png".into(),
+//                dst: (0, 0),
+//                size: None,
+//            },
+//            a: ImageConf {
+//                path: "resources/a.png".into(),
+//                dst: (302, 59),
+//                size: None,
+//            },
+//            b: ImageConf {
+//                path: "resources/b.png".into(),
+//                dst: (245, 110),
+//                size: None,
+//            },
+//            x: ImageConf {
+//                path: "resources/x.png".into(),
+//                dst: (384, 50),
+//                size: None,
+//            },
+//            y: ImageConf {
+//                path: "resources/y.png".into(),
+//                dst: (288, 12),
+//                size: None,
+//            },
+//            up: ImageConf {
+//                path: "resources/up.png".into(),
+//                dst: (231, 170),
+//                size: None,
+//            },
+//            down: ImageConf {
+//                path: "resources/down.png".into(),
+//                dst: (231, 205),
+//                size: None,
+//            },
+//            left: ImageConf {
+//                path: "resources/left.png".into(),
+//                dst: (208, 193),
+//                size: None,
+//            },
+//            right: ImageConf {
+//                path: "resources/right.png".into(),
+//                dst: (243, 193),
+//                size: None,
+//            },
+//            start: ImageConf {
+//                path: "resources/start.png".into(),
+//                dst: (298, 188),
+//                size: None,
+//            },
+//            analog: AnalogConf {
+//                image: ImageConf {
+//                    path: "resources/analog_marker.png".into(),
+//                    dst: (96, 113),
+//                    size: None,
+//                },
+//                range: (96, 96),
+//            },
+//            c: AnalogConf {
+//                image: ImageConf {
+//                    path: "resources/c_marker.png".into(),
+//                    dst: (380, 197),
+//                    size: None,
+//                },
+//                range: (34, 34),
+//            },
+//            l_analog: ImageConf {
+//                path: "resources/trigger_a.png".into(),
+//                dst: (443, 51),
+//                size: None,
+//            },
+//            r_analog: ImageConf {
+//                path: "resources/trigger_a.png".into(),
+//                dst: (472, 51),
+//                size: None,
+//            },
+//            l_digital: ImageConf {
+//                path: "resources/trigger_d.png".into(),
+//                dst: (443, 220),
+//                size: None,
+//            },
+//            r_digital: ImageConf {
+//                path: "resources/trigger_d.png".into(),
+//                dst: (472, 220),
+//                size: None,
+//            },
+//            z: ImageConf {
+//                path: "resources/z.png".into(),
+//                dst: (442, 17),
+//                size: None,
+//            },
+//        }
+//    };
+
+    let mut conf_reader = JsonConfig::from_path("onvar_theme.json");
 
     let conf = conf_reader.read_config();
 
