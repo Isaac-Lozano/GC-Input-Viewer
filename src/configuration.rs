@@ -1,3 +1,5 @@
+pub mod static_config;
+
 #[derive(Clone)]
 pub struct ImageConf {
     pub path: String,
