@@ -19,22 +19,22 @@ pub struct Analog<'a> {
 
 pub struct TextureCache<'a> {
     pub background: Image<'a>,
-    pub a: Image<'a>,
-    pub b: Image<'a>,
-    pub x: Image<'a>,
-    pub y: Image<'a>,
-    pub up: Image<'a>,
-    pub down: Image<'a>,
-    pub left: Image<'a>,
-    pub right: Image<'a>,
-    pub start: Image<'a>,
-    pub analog: Analog<'a>,
-    pub c: Analog<'a>,
-    pub l_analog: Image<'a>,
-    pub r_analog: Image<'a>,
-    pub l_digital: Image<'a>,
-    pub r_digital: Image<'a>,
-    pub z: Image<'a>,
+    pub a: Option<Image<'a>>,
+    pub b: Option<Image<'a>>,
+    pub x: Option<Image<'a>>,
+    pub y: Option<Image<'a>>,
+    pub up: Option<Image<'a>>,
+    pub down: Option<Image<'a>>,
+    pub left: Option<Image<'a>>,
+    pub right: Option<Image<'a>>,
+    pub start: Option<Image<'a>>,
+    pub analog: Option<Analog<'a>>,
+    pub c: Option<Analog<'a>>,
+    pub l_analog: Option<Image<'a>>,
+    pub r_analog: Option<Image<'a>>,
+    pub l_digital: Option<Image<'a>>,
+    pub r_digital: Option<Image<'a>>,
+    pub z: Option<Image<'a>>,
 }
 
 pub struct TextureCacheCreator<T> {
@@ -70,22 +70,22 @@ impl<T> TextureCacheCreator<T> {
 
     pub fn texture_cache(&self, conf: &Configuration) -> TextureCache {
         let background = self.read_image(&conf.background);
-        let a = self.read_image(&conf.a);
-        let b = self.read_image(&conf.b);
-        let x = self.read_image(&conf.x);
-        let y = self.read_image(&conf.y);
-        let up = self.read_image(&conf.up);
-        let down = self.read_image(&conf.down);
-        let left = self.read_image(&conf.left);
-        let right = self.read_image(&conf.right);
-        let start = self.read_image(&conf.start);
-        let a_marker = self.read_analog(&conf.analog);
-        let c_marker = self.read_analog(&conf.c);
-        let l_analog = self.read_image(&conf.l_analog);
-        let r_analog = self.read_image(&conf.r_analog);
-        let l_digital = self.read_image(&conf.l_digital);
-        let r_digital = self.read_image(&conf.r_digital);
-        let z = self.read_image(&conf.z);
+        let a = conf.a.as_ref().map(|i| self.read_image(i));
+        let b = conf.b.as_ref().map(|i| self.read_image(i));
+        let x = conf.x.as_ref().map(|i| self.read_image(i));
+        let y = conf.y.as_ref().map(|i| self.read_image(i));
+        let up = conf.up.as_ref().map(|i| self.read_image(i));
+        let down = conf.down.as_ref().map(|i| self.read_image(i));
+        let left = conf.left.as_ref().map(|i| self.read_image(i));
+        let right = conf.right.as_ref().map(|i| self.read_image(i));
+        let start = conf.start.as_ref().map(|i| self.read_image(i));
+        let a_marker = conf.analog.as_ref().map(|i| self.read_analog(i));
+        let c_marker = conf.c.as_ref().map(|i| self.read_analog(i));
+        let l_analog = conf.l_analog.as_ref().map(|i| self.read_image(i));
+        let r_analog = conf.r_analog.as_ref().map(|i| self.read_image(i));
+        let l_digital = conf.l_digital.as_ref().map(|i| self.read_image(i));
+        let r_digital = conf.r_digital.as_ref().map(|i| self.read_image(i));
+        let z = conf.z.as_ref().map(|i| self.read_image(i));
 
         TextureCache {
             background: background,

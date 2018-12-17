@@ -76,47 +76,47 @@ impl InputWindow {
 
         self.draw_image(&textures.background);
         if state.a {
-            self.draw_image(&textures.a);
+            textures.a.as_ref().map(|i| self.draw_image(i));
         }
         if state.b {
-            self.draw_image(&textures.b);
+            textures.b.as_ref().map(|i| self.draw_image(i));
         }
         if state.x {
-            self.draw_image(&textures.x);
+            textures.x.as_ref().map(|i| self.draw_image(i));
         }
         if state.y {
-            self.draw_image(&textures.y);
+            textures.y.as_ref().map(|i| self.draw_image(i));
         }
         if state.up {
-            self.draw_image(&textures.up);
+           textures.up.as_ref().map(|i|  self.draw_image(i));
         }
         if state.down {
-            self.draw_image(&textures.down);
+            textures.down.as_ref().map(|i| self.draw_image(i));
         }
         if state.left {
-            self.draw_image(&textures.left);
+            textures.left.as_ref().map(|i| self.draw_image(i));
         }
         if state.right {
-            self.draw_image(&textures.right);
+            textures.right.as_ref().map(|i| self.draw_image(i));
         }
         if state.start {
-            self.draw_image(&textures.start);
+            textures.start.as_ref().map(|i| self.draw_image(i));
         }
         if state.l_digital {
-            self.draw_image(&textures.l_digital);
+            textures.l_digital.as_ref().map(|i| self.draw_image(i));
         }
         if state.r_digital {
-            self.draw_image(&textures.r_digital);
+            textures.r_digital.as_ref().map(|i| self.draw_image(i));
         }
         if state.z {
-            self.draw_image(&textures.z);
+            textures.z.as_ref().map(|i| self.draw_image(i));
         }
 
-        self.draw_analog(&textures.analog, state.analog);
-        self.draw_analog(&textures.c, state.c);
+        textures.c.as_ref().map(|i| self.draw_analog(i, state.analog));
+        textures.analog.as_ref().map(|i| self.draw_analog(i, state.c));
 
-        self.draw_trigger(&textures.l_analog, state.l_analog);
-        self.draw_trigger(&textures.r_analog, state.r_analog);
+        textures.l_analog.as_ref().map(|i| self.draw_trigger(i, state.l_analog));
+        textures.r_analog.as_ref().map(|i| self.draw_trigger(i, state.r_analog));
 
         self.canvas.present();
     }
