@@ -22,11 +22,10 @@ fn main() {
 
     let state_mutex = Arc::new(Mutex::new(ControllerState::default()));
 
-    let conf_copy = conf.clone();
     let state_mutex_copy = state_mutex.clone();
-    let child = thread::spawn(move || {
-        let mut iw = InputWindow::new(&conf_copy, state_mutex_copy).unwrap();
-        iw.run(base, conf_copy);
+    thread::spawn(move || {
+        let mut iw = InputWindow::new(&conf, state_mutex_copy).unwrap();
+        iw.run(base, conf);
     });
 
     //let mut reader = DtmReader::from_path("test.dtm");
@@ -39,6 +38,4 @@ fn main() {
         let mut state = state_mutex.lock().unwrap();
         *state = new_state;
     }
-
-    child.join().unwrap();
 }
