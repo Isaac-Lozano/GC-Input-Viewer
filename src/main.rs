@@ -6,6 +6,7 @@ mod input_reader;
 
 use std::thread;
 use std::sync::{Arc, Mutex};
+use std::sync::mpsc;
 
 use crate::input_window::InputWindow;
 use crate::configuration::ConfigReader;
@@ -21,11 +22,13 @@ fn main() {
     let base = conf_reader.get_path_base();
 
     let state_mutex = Arc::new(Mutex::new(ControllerState::default()));
+    let (done_sender, done_receiver) = mpsc::channel::<()>();
 
     let state_mutex_copy = state_mutex.clone();
     thread::spawn(move || {
         let mut iw = InputWindow::new(&conf, state_mutex_copy).unwrap();
         iw.run(base, conf);
+        done_sender.send(()).unwrap();
     });
 
     //let mut reader = DtmReader::from_path("test.dtm");
@@ -34,6 +37,9 @@ fn main() {
     let mut reader = DtmReader::from_path("/home/onvar/Documents/sa2/tas/EggQuartersM3_1049_D4.dtm");
     //let mut reader = SerialReader::from_path("COM11");
     loop {
+        if done_receiver.try_recv().is_ok() {
+            break;
+        }
         let new_state = reader.read_next_input();
         let mut state = state_mutex.lock().unwrap();
         *state = new_state;
