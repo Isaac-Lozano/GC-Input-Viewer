@@ -1,5 +1,4 @@
 pub mod dtm_reader;
-pub mod file_reader;
 pub mod serial_reader;
 #[cfg(windows)]
 pub mod sa2_reader;
