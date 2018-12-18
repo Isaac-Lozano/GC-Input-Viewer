@@ -14,6 +14,8 @@ use crate::configuration::json_config::JsonConfig;
 use crate::controller_state::ControllerState;
 use crate::input_reader::InputReader;
 use crate::input_reader::dtm_reader::DtmReader;
+use crate::input_reader::serial_reader::SerialReader;
+use crate::input_reader::sa2_reader::Sa2Reader;
 
 fn main() {
     let mut conf_reader = JsonConfig::from_path("skins/onvar_theme/onvar_theme.json");
@@ -34,8 +36,9 @@ fn main() {
     //let mut reader = DtmReader::from_path("test.dtm");
     //let mut reader = DtmReader::from_path("Mission_Street_m1_in_146.40.dtm");
     //let mut reader = DtmReader::from_path("Mission_Street_m3_in_119.10.dtm");
-    let mut reader = DtmReader::from_path("/home/onvar/Documents/sa2/tas/EggQuartersM3_1049_D4.dtm");
-    //let mut reader = SerialReader::from_path("COM11");
+    //let mut reader = DtmReader::from_path("/home/onvar/Documents/sa2/tas/EggQuartersM3_1049_D4.dtm");
+    //let mut reader = SerialReader::from_path("COM9");
+    let mut reader = Sa2Reader::new();
     loop {
         if done_receiver.try_recv().is_ok() {
             break;

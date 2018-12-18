@@ -112,8 +112,8 @@ impl InputWindow {
             textures.z.as_ref().map(|i| self.draw_image(i));
         }
 
-        textures.c.as_ref().map(|i| self.draw_analog(i, state.analog));
-        textures.analog.as_ref().map(|i| self.draw_analog(i, state.c));
+        textures.analog.as_ref().map(|i| self.draw_analog(i, state.analog));
+        textures.c.as_ref().map(|i| self.draw_analog(i, state.c));
 
         textures.l_analog.as_ref().map(|i| self.draw_trigger(i, state.l_analog));
         textures.r_analog.as_ref().map(|i| self.draw_trigger(i, state.r_analog));
