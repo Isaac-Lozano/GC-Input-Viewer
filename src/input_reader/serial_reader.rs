@@ -1,6 +1,5 @@
 use std::io::{Read, BufRead, BufReader};
 use std::time::Duration;
-use std::str::Chars;
 
 use serialport::{SerialPort, SerialPortSettings, DataBits, FlowControl, Parity, StopBits};
 
