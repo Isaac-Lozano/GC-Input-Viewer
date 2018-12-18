@@ -107,15 +107,6 @@ impl ProcessHandle {
         value |= buf[0] as u32;
         value
     }
-
-    pub fn read_u8(&self, address: u64) -> u8 {
-        let mut buf = [0; 1];
-        let bytes_read = self.read_data(address, &mut buf);
-        if bytes_read != 1 {
-            panic!("Not enough bytes read");
-        }
-        buf[0]
-    }
 }
 
 #[derive(Clone,Copy,Debug)]

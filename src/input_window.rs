@@ -12,7 +12,7 @@ use sdl2::Sdl;
 
 use crate::texture_cache::{CanvasExt, TextureCache, Image, Analog};
 use crate::controller_state::ControllerState;
-use crate::configuration::Configuration;
+use crate::configuration::ThemeConfiguration;
 
 pub struct InputWindow {
     sdl: Sdl,
@@ -21,7 +21,7 @@ pub struct InputWindow {
 }
 
 impl InputWindow {
-    pub fn new(conf: &Configuration, state: Arc<Mutex<ControllerState>>) -> Result<InputWindow, String> {
+    pub fn new(conf: &ThemeConfiguration, state: Arc<Mutex<ControllerState>>) -> Result<InputWindow, String> {
         let sdl = sdl2::init().unwrap();
         let video = sdl.video().unwrap();
 
@@ -121,7 +121,7 @@ impl InputWindow {
         self.canvas.present();
     }
 
-    pub fn run(&mut self, base: PathBuf, conf: Configuration) {
+    pub fn run(&mut self, base: PathBuf, conf: ThemeConfiguration) {
         let tex_cache_creator = self.canvas.texture_cache_creator(base);
         let mut tex = tex_cache_creator.texture_cache(&conf);
 

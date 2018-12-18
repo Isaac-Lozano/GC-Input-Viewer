@@ -9,8 +9,7 @@ use std::sync::{Arc, Mutex};
 use std::sync::mpsc;
 
 use crate::input_window::InputWindow;
-use crate::configuration::ConfigReader;
-use crate::configuration::json_config::JsonConfig;
+use crate::configuration::{Configuration, InputSource};
 use crate::controller_state::ControllerState;
 use crate::input_reader::InputReader;
 use crate::input_reader::dtm_reader::DtmReader;
@@ -18,27 +17,25 @@ use crate::input_reader::serial_reader::SerialReader;
 use crate::input_reader::sa2_reader::Sa2Reader;
 
 fn main() {
-    let mut conf_reader = JsonConfig::from_path("skins/onvar_theme/onvar_theme.json");
-
-    let conf = conf_reader.read_config();
-    let base = conf_reader.get_path_base();
+    let conf = Configuration::from_path("conf.yaml");
+    let theme = conf.theme;
+    let base = conf.theme_path;
+    let mut reader: Box<dyn InputReader> = match conf.input {
+        InputSource::Dtm(path) => Box::new(DtmReader::from_path(&path)),
+        InputSource::Sa2(_exe_name) => Box::new(Sa2Reader::new()),
+        InputSource::Serial(path) => Box::new(SerialReader::from_path(&path)),
+    };
 
     let state_mutex = Arc::new(Mutex::new(ControllerState::default()));
     let (done_sender, done_receiver) = mpsc::channel::<()>();
 
     let state_mutex_copy = state_mutex.clone();
     thread::spawn(move || {
-        let mut iw = InputWindow::new(&conf, state_mutex_copy).unwrap();
-        iw.run(base, conf);
+        let mut iw = InputWindow::new(&theme, state_mutex_copy).unwrap();
+        iw.run(base, theme);
         done_sender.send(()).unwrap();
     });
 
-    //let mut reader = DtmReader::from_path("test.dtm");
-    //let mut reader = DtmReader::from_path("Mission_Street_m1_in_146.40.dtm");
-    //let mut reader = DtmReader::from_path("Mission_Street_m3_in_119.10.dtm");
-    //let mut reader = DtmReader::from_path("/home/onvar/Documents/sa2/tas/EggQuartersM3_1049_D4.dtm");
-    //let mut reader = SerialReader::from_path("COM9");
-    let mut reader = Sa2Reader::new();
     loop {
         if done_receiver.try_recv().is_ok() {
             break;

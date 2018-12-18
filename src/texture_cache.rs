@@ -5,7 +5,7 @@ use sdl2::image::LoadTexture;
 use sdl2::rect::Rect;
 use sdl2::video::{Window, WindowContext};
 
-use crate::configuration::{Configuration, ImageConf, AnalogConf};
+use crate::configuration::{ThemeConfiguration, ImageConf, AnalogConf};
 
 pub struct Image<'a> {
     pub tex: Texture<'a>,
@@ -68,7 +68,7 @@ impl<T> TextureCacheCreator<T> {
         }
     }
 
-    pub fn texture_cache(&self, conf: &Configuration) -> TextureCache {
+    pub fn texture_cache(&self, conf: &ThemeConfiguration) -> TextureCache {
         let background = self.read_image(&conf.background);
         let a = conf.a.as_ref().map(|i| self.read_image(i));
         let b = conf.b.as_ref().map(|i| self.read_image(i));

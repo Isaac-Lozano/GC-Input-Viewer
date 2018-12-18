@@ -1,0 +1,96 @@
+size:
+- 512
+- 256
+background:
+  path: background.png
+  dst:
+  - 0
+  - 0
+a:
+  path: a.png
+  dst:
+  - 302
+  - 59
+b:
+  path: b.png
+  dst:
+  - 245
+  - 110
+x:
+  path: x.png
+  dst:
+  - 384
+  - 50
+y:
+  path: y.png
+  dst:
+  - 288
+  - 12
+up:
+  path: up.png
+  dst:
+  - 231
+  - 170
+down:
+  path: down.png
+  dst:
+  - 231
+  - 205
+left:
+  path: left.png
+  dst:
+  - 208
+  - 193
+right:
+  path: right.png
+  dst:
+  - 243
+  - 193
+start:
+  path: start.png
+  dst:
+  - 298
+  - 188
+analog:
+  image:
+    path: analog_marker.png
+    dst:
+    - 96
+    - 113
+  range:
+  - 96
+  - 96
+c:
+  image:
+    path: c_marker.png
+    dst:
+    - 380
+    - 197
+  range:
+  - 34
+  - 34
+l_analog:
+  path: trigger_a.png
+  dst:
+  - 443
+  - 51
+r_analog:
+  path: trigger_a.png
+  dst:
+  - 472
+  - 51
+l_digital:
+  path: trigger_d.png
+  dst:
+  - 443
+  - 220
+r_digital:
+  path: trigger_d.png
+  dst:
+  - 472
+  - 220
+z:
+  path: z.png
+  dst:
+  - 442
+  - 17
