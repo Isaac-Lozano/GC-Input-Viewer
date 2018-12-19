@@ -4,7 +4,7 @@ use std::path::{Path, PathBuf};
 
 use serde_derive::Deserialize;
 
-use crate::error::ConfigResult;
+use crate::error::{Error, Result};
 
 #[derive(Clone, Debug, Deserialize)]
 pub struct ImageConf {
@@ -42,13 +42,13 @@ pub struct ThemeConfiguration {
 }
 
 impl ThemeConfiguration {
-    pub fn from_read<R>(reader: R) -> ConfigResult<ThemeConfiguration>
+    pub fn from_read<R>(reader: R) -> Result<ThemeConfiguration>
         where R: Read,
     {
         Ok(serde_yaml::from_reader(reader)?)
     }
 
-    pub fn from_path<P>(path: P) -> ConfigResult<ThemeConfiguration>
+    pub fn from_path<P>(path: P) -> Result<ThemeConfiguration>
         where P: AsRef<Path>,
     {
         let file = File::open(path)?;
@@ -71,7 +71,7 @@ pub struct Configuration {
 }
 
 impl Configuration {
-    pub fn from_read<R>(reader: R) -> ConfigResult<Configuration>
+    pub fn from_read<R>(reader: R) -> Result<Configuration>
         where R: Read,
     {
         let conf_file: ConfigurationFile = serde_yaml::from_reader(reader)?;
@@ -88,7 +88,7 @@ impl Configuration {
         })
     }
 
-    pub fn from_path<P>(path: P) -> ConfigResult<Configuration>
+    pub fn from_path<P>(path: P) -> Result<Configuration>
         where P: AsRef<Path>,
     {
         let file = File::open(path)?;

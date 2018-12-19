@@ -1,50 +1,51 @@
-use std::error::Error;
+use std::error;
 use std::fmt;
 use std::io::Error as IoError;
+use std::result;
 
 use serde_yaml::Error as YamlError;
 
 #[derive(Debug)]
-pub enum ConfigError {
+pub enum Error {
     IoError(IoError),
     YamlError(YamlError),
 }
 
-impl fmt::Display for ConfigError {
+impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
-            ConfigError::IoError(ref err) => write!(f, "IO Error: {}", err),
-            ConfigError::YamlError(ref err) => write!(f, "Yaml Error: {}", err),
+            Error::IoError(ref err) => write!(f, "IO Error: {}", err),
+            Error::YamlError(ref err) => write!(f, "Yaml Error: {}", err),
         }
     }
 }
 
-impl Error for ConfigError {
+impl error::Error for Error {
     fn description(&self) -> &str {
         match *self {
-            ConfigError::IoError(ref err) => err.description(),
-            ConfigError::YamlError(ref err) => err.description(),
+            Error::IoError(ref err) => err.description(),
+            Error::YamlError(ref err) => err.description(),
         }
     }
 
-    fn cause(&self) -> Option<&Error> {
+    fn cause(&self) -> Option<&error::Error> {
         match *self {
-            ConfigError::IoError(ref err) => Some(err),
-            ConfigError::YamlError(ref err) => Some(err),
+            Error::IoError(ref err) => Some(err),
+            Error::YamlError(ref err) => Some(err),
         }
     }
 }
 
-impl From<IoError> for ConfigError {
-    fn from(err: IoError) -> ConfigError {
-        ConfigError::IoError(err)
+impl From<IoError> for Error {
+    fn from(err: IoError) -> Error {
+        Error::IoError(err)
     }
 }
 
-impl From<YamlError> for ConfigError {
-    fn from(err: YamlError) -> ConfigError {
-        ConfigError::YamlError(err)
+impl From<YamlError> for Error {
+    fn from(err: YamlError) -> Error {
+        Error::YamlError(err)
     }
 }
 
-pub type ConfigResult<T> = Result<T, ConfigError>;
+pub type Result<T> = result::Result<T, Error>;
