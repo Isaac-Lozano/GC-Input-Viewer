@@ -3,6 +3,7 @@ mod configuration;
 mod texture_cache;
 mod controller_state;
 mod input_reader;
+mod error;
 
 use std::thread;
 use std::sync::{Arc, Mutex};
@@ -18,7 +19,7 @@ use crate::input_reader::sa2_reader::Sa2Reader;
 
 fn main() {
     // Read from configuration file.
-    let conf = Configuration::from_path("conf.yaml");
+    let conf = Configuration::from_path("conf.yaml").unwrap();
     let theme = conf.theme;
     let base = conf.theme_path;
     // Take input from whatever input method is specified in the config file.

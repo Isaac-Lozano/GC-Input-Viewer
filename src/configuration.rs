@@ -4,6 +4,8 @@ use std::path::{Path, PathBuf};
 
 use serde_derive::Deserialize;
 
+use crate::error::ConfigResult;
+
 #[derive(Clone, Debug, Deserialize)]
 pub struct ImageConf {
     pub path: String,
@@ -40,23 +42,18 @@ pub struct ThemeConfiguration {
 }
 
 impl ThemeConfiguration {
-    pub fn from_read<R>(reader: R) -> ThemeConfiguration
+    pub fn from_read<R>(reader: R) -> ConfigResult<ThemeConfiguration>
         where R: Read,
     {
-        serde_yaml::from_reader(reader).unwrap()
+        Ok(serde_yaml::from_reader(reader)?)
     }
 
-    pub fn from_path<P>(path: P) -> ThemeConfiguration
+    pub fn from_path<P>(path: P) -> ConfigResult<ThemeConfiguration>
         where P: AsRef<Path>,
     {
-        let file = File::open(path).unwrap();
+        let file = File::open(path)?;
         Self::from_read(file)
     }
-}
-
-pub trait ThemeReader {
-    fn read_config(&mut self) -> ThemeConfiguration;
-    fn get_path_base(&mut self) -> PathBuf;
 }
 
 #[derive(Clone, Debug, Deserialize)]
@@ -74,27 +71,27 @@ pub struct Configuration {
 }
 
 impl Configuration {
-    pub fn from_read<R>(reader: R) -> Configuration
+    pub fn from_read<R>(reader: R) -> ConfigResult<Configuration>
         where R: Read,
     {
-        let conf_file: ConfigurationFile = serde_yaml::from_reader(reader).unwrap();
-        let theme = ThemeConfiguration::from_path(&conf_file.theme_path);
+        let conf_file: ConfigurationFile = serde_yaml::from_reader(reader)?;
+        let theme = ThemeConfiguration::from_path(&conf_file.theme_path)?;
         let theme_path = conf_file.theme_path
             .parent()
-            .unwrap()
+            .unwrap_or(Path::new("/"))
             .to_owned();
 
-        Configuration {
+        Ok(Configuration {
             theme: theme,
             theme_path: theme_path,
             input: conf_file.input,
-        }
+        })
     }
 
-    pub fn from_path<P>(path: P) -> Configuration
+    pub fn from_path<P>(path: P) -> ConfigResult<Configuration>
         where P: AsRef<Path>,
     {
-        let file = File::open(path).unwrap();
+        let file = File::open(path)?;
         Self::from_read(file)
     }
 }
