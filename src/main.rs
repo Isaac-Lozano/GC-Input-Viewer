@@ -38,7 +38,10 @@ fn main() {
     // Start display thread.
     thread::spawn(move || {
         let mut iw = InputWindow::new(&theme, state_mutex_copy).unwrap();
-        iw.run(base, theme);
+        match iw.run(base, theme) {
+            Err(e) => println!("Error in display thread: {}", e),
+            _ => {}
+        }
         // Send done signal when display thread has ended.
         done_sender.send(()).unwrap();
     });
