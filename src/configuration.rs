@@ -4,7 +4,7 @@ use std::path::{Path, PathBuf};
 
 use serde_derive::Deserialize;
 
-use crate::error::{Error, Result};
+use crate::error::Result;
 
 #[derive(Clone, Debug, Deserialize)]
 pub struct ImageConf {
