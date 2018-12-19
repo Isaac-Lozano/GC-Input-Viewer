@@ -176,7 +176,7 @@ impl InputWindow {
 
     pub fn run(&mut self, base: PathBuf, conf: ThemeConfiguration) -> Result<()> {
         let tex_cache_creator = self.canvas.texture_cache_creator(base);
-        let mut tex = tex_cache_creator.texture_cache(&conf);
+        let mut tex = tex_cache_creator.texture_cache(&conf)?;
 
         let mut event_pump = self.sdl.event_pump()?;
         'running: loop {
