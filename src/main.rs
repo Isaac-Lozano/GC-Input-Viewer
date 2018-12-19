@@ -15,7 +15,7 @@ use crate::controller_state::ControllerState;
 use crate::input_reader::InputReader;
 use crate::input_reader::dtm_reader::DtmReader;
 use crate::input_reader::serial_reader::SerialReader;
-use crate::input_reader::sa2_reader::Sa2Reader;
+//use crate::input_reader::sa2_reader::Sa2Reader;
 
 fn main() {
     // Read from configuration file.
@@ -24,9 +24,15 @@ fn main() {
     let base = conf.theme_path;
     // Take input from whatever input method is specified in the config file.
     let mut reader: Box<dyn InputReader> = match conf.input {
-        InputSource::Dtm(path) => Box::new(DtmReader::from_path(&path)),
-        InputSource::Sa2(_exe_name) => Box::new(Sa2Reader::new()),
-        InputSource::Serial(path) => Box::new(SerialReader::from_path(&path)),
+        InputSource::Dtm(path) => {
+            let dtm_reader = DtmReader::from_path(&path).unwrap();
+            Box::new(dtm_reader)
+        }
+        InputSource::Sa2(_exe_name) => unimplemented!(), //Box::new(Sa2Reader::new()),
+        InputSource::Serial(path) => {
+            let serial_reader = SerialReader::from_path(&path).unwrap();
+            Box::new(serial_reader)
+        }
     };
 
     // Make a controller state to share across threads.
@@ -53,7 +59,7 @@ fn main() {
             break;
         }
         // Read new input.
-        let new_state = reader.read_next_input();
+        let new_state = reader.read_next_input().unwrap();
         // Update mutex.
         let mut state = state_mutex.lock().unwrap();
         *state = new_state;

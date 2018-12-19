@@ -3,6 +3,7 @@ use std::time::Duration;
 
 use serialport::{SerialPort, SerialPortSettings, DataBits, FlowControl, Parity, StopBits};
 
+use crate::error::Result;
 use crate::input_reader::InputReader;
 use crate::controller_state::ControllerState;
 
@@ -11,7 +12,7 @@ pub struct SerialReader<S> {
 }
 
 impl SerialReader<Box<dyn SerialPort>> {
-    pub fn from_path(path: &str) -> SerialReader<Box<dyn SerialPort>> {
+    pub fn from_path(path: &str) -> Result<SerialReader<Box<dyn SerialPort>>> {
         let s = SerialPortSettings {
             baud_rate: 115200,
             data_bits: DataBits::Eight,
@@ -20,86 +21,99 @@ impl SerialReader<Box<dyn SerialPort>> {
             stop_bits: StopBits::One,
             timeout: Duration::from_millis(10),
         };
-        let port = serialport::open_with_settings(path, &s).unwrap();
+        let port = serialport::open_with_settings(path, &s)?;
 
-        SerialReader {
+        Ok(SerialReader {
             port: BufReader::new(port),
-        }
+        })
     }
-}
-
-fn read_byte<C>(chars: &mut C) -> u8
-    where C: Iterator<Item = char>,
-{
-    let mut value = 0;
-    value |= (chars.next().unwrap() == '1') as u8;
-    value <<= 1;
-    value |= (chars.next().unwrap() == '1') as u8;
-    value <<= 1;
-    value |= (chars.next().unwrap() == '1') as u8;
-    value <<= 1;
-    value |= (chars.next().unwrap() == '1') as u8;
-    value <<= 1;
-    value |= (chars.next().unwrap() == '1') as u8;
-    value <<= 1;
-    value |= (chars.next().unwrap() == '1') as u8;
-    value <<= 1;
-    value |= (chars.next().unwrap() == '1') as u8;
-    value <<= 1;
-    value |= (chars.next().unwrap() == '1') as u8;
-    value
 }
 
 impl<R> InputReader for SerialReader<R>
     where R: Read
 {
-    fn read_next_input(&mut self) -> ControllerState {
+    fn read_next_input(&mut self) -> Result<ControllerState> {
         let mut buf = String::new();
 
         loop {
             buf.clear();
-            match self.port.read_line(&mut buf) {
-                Ok(num_chars) => {
-//                    println!("{:?} {}", buf, num_chars);
-
-                    if num_chars == 65 {
-                        break;
-                    }
-                }
-                Err(_) => {}
+            self.port.read_line(&mut buf)?;
+            let mut reader = StateReader::new(buf.chars());
+            if let Some(state) = reader.read_state() {
+                return Ok(state);
             }
         }
+    }
+}
 
+struct StateReader<I> {
+    iter: I,
+}
+
+impl<I> StateReader<I>
+    where I: Iterator<Item = char>,
+{
+    fn new(iter: I) -> StateReader<I> {
+        StateReader {
+            iter: iter,
+        }
+    }
+
+    fn read_bool(&mut self) -> Option<bool> {
+        self.iter.next().map(|ch| ch == '1')
+    }
+
+    fn read_byte(&mut self) -> Option<u8> {
+        let mut value = 0;
+        value |= (self.iter.next()? == '1') as u8;
+        value <<= 1;
+        value |= (self.iter.next()? == '1') as u8;
+        value <<= 1;
+        value |= (self.iter.next()? == '1') as u8;
+        value <<= 1;
+        value |= (self.iter.next()? == '1') as u8;
+        value <<= 1;
+        value |= (self.iter.next()? == '1') as u8;
+        value <<= 1;
+        value |= (self.iter.next()? == '1') as u8;
+        value <<= 1;
+        value |= (self.iter.next()? == '1') as u8;
+        value <<= 1;
+        value |= (self.iter.next()? == '1') as u8;
+        Some(value)
+    }
+
+    fn read_state(&mut self) -> Option<ControllerState> {
         let mut state = ControllerState::default();
-        let mut chars = buf.chars().skip(3);
-        state.start = chars.next().unwrap() == '1';
-        state.y = chars.next().unwrap() == '1';
-        state.x = chars.next().unwrap() == '1';
-        state.b = chars.next().unwrap() == '1';
-        state.a = chars.next().unwrap() == '1';
-        chars.next().unwrap();
-        state.l_digital = chars.next().unwrap() == '1';
-        state.r_digital = chars.next().unwrap() == '1';
-        state.z = chars.next().unwrap() == '1';
-        state.up = chars.next().unwrap() == '1';
-        state.down = chars.next().unwrap() == '1';
-        state.right = chars.next().unwrap() == '1';
-        state.left = chars.next().unwrap() == '1';
+        self.iter.next()?;
+        self.iter.next()?;
+        self.iter.next()?;
+        state.start = self.read_bool()?;
+        state.y = self.read_bool()?;
+        state.x = self.read_bool()?;
+        state.b = self.read_bool()?;
+        state.a = self.read_bool()?;
+        self.iter.next()?;
+        state.l_digital = self.read_bool()?;
+        state.r_digital = self.read_bool()?;
+        state.z = self.read_bool()?;
+        state.up = self.read_bool()?;
+        state.down = self.read_bool()?;
+        state.right = self.read_bool()?;
+        state.left = self.read_bool()?;
 
-        let analog_x = read_byte(&mut chars);
-        let analog_y = read_byte(&mut chars);
+        let analog_x = self.read_byte()?;
+        let analog_y = self.read_byte()?;
         state.analog = (analog_x, analog_y);
 
 
-        let c_x = read_byte(&mut chars);
-        let c_y = read_byte(&mut chars);
+        let c_x = self.read_byte()?;
+        let c_y = self.read_byte()?;
         state.c = (c_x, c_y);
 
-        state.l_analog = read_byte(&mut chars);
-        state.r_analog = read_byte(&mut chars);
+        state.l_analog = self.read_byte()?;
+        state.r_analog = self.read_byte()?;
 
-//        println!("{:?}", state);
-
-        state
+        Some(state)
     }
 }

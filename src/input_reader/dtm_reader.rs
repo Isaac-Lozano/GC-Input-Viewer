@@ -6,6 +6,7 @@ use std::time::{Instant, Duration};
 use dtm2txt::decoder::dtm_decoder::DtmDecoder;
 use dtm2txt::dtm::Dtm;
 
+use crate::error::Result;
 use crate::input_reader::InputReader;
 use crate::controller_state::ControllerState;
 
@@ -16,26 +17,26 @@ pub struct DtmReader {
 }
 
 impl DtmReader {
-    pub fn from_file(file: File) -> DtmReader {
+    pub fn from_file(file: File) -> Result<DtmReader> {
         let buf = BufReader::new(file);
         let dtm_decoder = DtmDecoder::new(buf);
-        let dtm = dtm_decoder.decode().unwrap();
+        let dtm = dtm_decoder.decode()?;
 
-        DtmReader {
+        Ok(DtmReader {
             dtm: dtm,
             frame: 0,
             playback_start: None,
-        }
+        })
     }
 
-    pub fn from_path(path: &str) -> DtmReader {
-        let file = File::open(path).unwrap();
+    pub fn from_path(path: &str) -> Result<DtmReader> {
+        let file = File::open(path)?;
         Self::from_file(file)
     }
 }
 
 impl InputReader for DtmReader {
-    fn read_next_input(&mut self) -> ControllerState {
+    fn read_next_input(&mut self) -> Result<ControllerState> {
         if self.playback_start.is_none() {
             self.playback_start = Some(Instant::now());
         }
@@ -70,6 +71,6 @@ impl InputReader for DtmReader {
             self.frame += 1;
         }
 
-        state
+        Ok(state)
     }
 }

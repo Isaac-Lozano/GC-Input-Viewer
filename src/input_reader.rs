@@ -4,7 +4,8 @@ pub mod serial_reader;
 pub mod sa2_reader;
 
 use crate::controller_state::ControllerState;
+use crate::error::Result;
 
 pub trait InputReader {
-    fn read_next_input(&mut self) -> ControllerState;
+    fn read_next_input(&mut self) -> Result<ControllerState>;
 }
