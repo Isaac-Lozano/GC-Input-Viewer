@@ -5,7 +5,7 @@ authors = ["Isaac Lozano <109lozanoi@gmail.com>"]
 edition = "2018"
 
 [dependencies]
-dtm2txt = {path = "../dtm2txt"}
+dtm2txt = {git = "https://github.com/Isaac-Lozano/dtm2txt.git"}
 serialport = "3.1.0"
 serde = "1.0"
 serde_derive = "1.0"
