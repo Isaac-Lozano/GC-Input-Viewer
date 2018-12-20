@@ -6,7 +6,7 @@ use std::time::Duration;
 use crate::controller_state::ControllerState;
 use crate::error::Result;
 use crate::input_reader::InputReader;
-use crate::input_reader::sa2_reader::process_reader::{ProcessHandle, ProcessIterator};
+use crate::input_reader::sa2_reader::process_reader::ProcessHandle;
 
 const SONIC_2_APP_EXE: &'static str = "sonic2app.exe";
 const BUTTON_ADDR: u64 = 0x0000000001A52C4C;
