@@ -1,0 +1,55 @@
+size:
+- 216
+- 136
+background:
+  path: background.png
+  dst:
+  - 0
+  - 0
+a:
+  path: buttA.png
+  dst:
+  - 4
+  - 100
+b:
+  path: buttB.png
+  dst:
+  - 180
+  - 100
+x:
+  path: buttX.png
+  dst:
+  - 180
+  - 52
+y:
+  path: buttY.png
+  dst:
+  - 4
+  - 52
+start:
+  path: buttS.png
+  dst:
+  - 156
+  - 4
+analog:
+  image:
+    path: stick.png
+    dst:
+    - 104
+    - 64
+  range:
+  - 64
+  - 64
+  line_from:
+  - 108
+  - 68
+l_digital:
+  path: buttL.png
+  dst:
+  - 4
+  - 4
+r_digital:
+  path: buttR.png
+  dst:
+  - 180
+  - 4
