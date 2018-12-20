@@ -14,14 +14,16 @@ const JOY_Y_ADDR: u64 = 0x0000000001A52C54;
 
 pub struct Sa2Reader {
     phandle: Option<ProcessHandle>,
+    exe_name: String,
 }
 
 impl Sa2Reader {
-    pub fn new() -> Result<Sa2Reader> {
-        let phandle = ProcessHandle::from_name("sonic2App.exe")?;
+    pub fn new(exe_name: String) -> Result<Sa2Reader> {
+        let phandle = ProcessHandle::from_name(&exe_name)?;
 
         Ok(Sa2Reader {
             phandle: phandle,
+            exe_name: exe_name,
         })
     }
 }
@@ -29,7 +31,7 @@ impl Sa2Reader {
 impl InputReader for Sa2Reader {
     fn read_next_input(&mut self) -> Result<ControllerState> {
         while self.phandle.is_none() {
-            self.phandle = ProcessHandle::from_name("sonic2App.exe")?;
+            self.phandle = ProcessHandle::from_name(&self.exe_name)?;
             thread::sleep(Duration::from_secs(1));
         }
 

@@ -19,6 +19,8 @@ use crate::input_reader::dtm_reader::DtmReader;
 use crate::input_reader::serial_reader::SerialReader;
 use crate::input_reader::sa2_reader::Sa2Reader;
 
+const SONIC_ADVENTURE_2_EXE: &'static str = "sonic2App.exe";
+
 fn main() {
     // Read from configuration file.
     let conf = Configuration::from_path("conf.yaml").unwrap_or_barf("Error opening \"conf.yaml\" configuration file");
@@ -30,8 +32,9 @@ fn main() {
             let dtm_reader = DtmReader::from_path(&path).unwrap_or_barf("Could not open dtm file");
             Box::new(dtm_reader)
         }
-        InputSource::Sa2(_exe_name) => {
-            let sa2_reader = Sa2Reader::new().unwrap_or_barf("Could not open SA2 reader");
+        InputSource::Sa2(exe_name_opt) => {
+            let exe_name = exe_name_opt.unwrap_or(SONIC_ADVENTURE_2_EXE.into());
+            let sa2_reader = Sa2Reader::new(exe_name).unwrap_or_barf("Could not open SA2 reader");
             Box::new(sa2_reader)
         }
         InputSource::Serial(path) => {

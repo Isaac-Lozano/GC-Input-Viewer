@@ -59,7 +59,7 @@ impl ThemeConfiguration {
 #[derive(Clone, Debug, Deserialize)]
 pub enum InputSource {
     Dtm(String),
-    Sa2(String),
+    Sa2(Option<String>),
     Serial(String),
 }
 
