@@ -19,5 +19,3 @@ features = ["image"]
 [dependencies.winapi]
 version = "0.3.6"
 features = ["psapi", "memoryapi", "processthreadsapi"]
-
-[target.windows.dependencies]
