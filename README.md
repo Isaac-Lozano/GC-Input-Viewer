@@ -65,10 +65,42 @@ The theme file is more involved. It contains the following fields.
   * `range`
     * x
     * y
-  * `line_from`
+  * `line_from` (optional)
     * x
     * y
 * `c` (optional)
   * ...
+* `l_analog` (optional)
+  * `image`
+    * `path`
+      * path
+    * `dst`
+      * x
+      * y
+    * `size` (optional)
+      * width
+      * height
+  * `direction`
+    * one of:
+      * `up`
+      * `down`
+      * `left`
+      * `right`
+* `r_analog` (optional)
+  * `image`
+    * `path`
+      * path
+    * `dst`
+      * x
+      * y
+    * `size` (optional)
+      * width
+      * height
+  * `direction`
+    * one of:
+      * `up`
+      * `down`
+      * `left`
+      * `right`
 
 All paths are relative to the theme file.
