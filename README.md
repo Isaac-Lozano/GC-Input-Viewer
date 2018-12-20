@@ -11,9 +11,9 @@ The main configuration file is `conf.yaml`. This file contains two settings:
 * `input` tells the program what input method to use.
 
 There are currently three different input methods.
-* `Serial` reads from the COM port specified as its argument.
-* `Dtm` reads from a dtm file specified as its argument.
-* `Sa2` reads from a running instance of SA2.
+* `serial` reads from the COM port specified as its argument.
+* `dtm` reads from a dtm file specified as its argument.
+* `sa2` reads from a running instance of SA2.
   * If this method doesn't work, you can specify a custom exe to attach to.
 
 ## Themes
