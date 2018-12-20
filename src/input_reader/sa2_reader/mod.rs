@@ -8,6 +8,7 @@ use crate::error::Result;
 use crate::input_reader::InputReader;
 use crate::input_reader::sa2_reader::process_reader::{ProcessHandle, ProcessIterator};
 
+const SONIC_2_APP_EXE: &'static str = "sonic2app.exe";
 const BUTTON_ADDR: u64 = 0x0000000001A52C4C;
 const JOY_X_ADDR: u64 = 0x0000000001A52C50;
 const JOY_Y_ADDR: u64 = 0x0000000001A52C54;
@@ -24,7 +25,7 @@ impl Sa2Reader {
                 pname == *name
             }
             else {
-                pname == "sonic2App.exe" || pname == "sonic2App.exe"
+                pname.to_lowercase() == SONIC_2_APP_EXE
             }
         })?;
 
@@ -43,7 +44,7 @@ impl InputReader for Sa2Reader {
                     pname == *name
                 }
                 else {
-                    pname == "sonic2App.exe" || pname == "sonic2App.exe"
+                    pname.to_lowercase() == SONIC_2_APP_EXE
                 }
             })?;
             thread::sleep(Duration::from_secs(1));
