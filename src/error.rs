@@ -14,6 +14,7 @@ pub enum Error {
     Sdl2Error(Box<dyn error::Error>),
     DtmError(DtmError),
     SerialError(SerialError),
+    ProcessError(&'static str),
 }
 
 impl fmt::Display for Error {
@@ -24,6 +25,7 @@ impl fmt::Display for Error {
             Error::Sdl2Error(ref err) => write!(f, "Sdl2 Error: {}", err),
             Error::DtmError(ref err) => write!(f, "Dtm Error: {}", err),
             Error::SerialError(ref err) => write!(f, "Serial Error: {}", err),
+            Error::ProcessError(ref err) => write!(f, "Process Error: {}", err),
         }
     }
 }
@@ -36,6 +38,7 @@ impl error::Error for Error {
             Error::Sdl2Error(ref err) => err.description(),
             Error::DtmError(ref err) => err.description(),
             Error::SerialError(ref err) => err.description(),
+            Error::ProcessError(ref err) => err,
         }
     }
 
@@ -47,6 +50,7 @@ impl error::Error for Error {
             Error::Sdl2Error(ref _err) => None,
             Error::DtmError(ref err) => Some(err),
             Error::SerialError(ref err) => Some(err),
+            Error::ProcessError(_) => None,
         }
     }
 }

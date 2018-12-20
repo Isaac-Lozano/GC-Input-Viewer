@@ -10,54 +10,59 @@ use winapi::um::processthreadsapi;
 use winapi::um::psapi;
 use winapi::um::winnt::{HANDLE, PROCESS_QUERY_INFORMATION, PROCESS_VM_READ};
 
+use crate::error::{Error, Result};
+
 const PROCESS_BUFFER_LEN: usize = 1024;
 
 #[derive(Clone,Copy,Debug)]
 pub struct ProcessHandle(HANDLE);
 
 impl ProcessHandle {
-    fn open_process(id: ProcessId, mode: u32) -> Option<ProcessHandle> {
+    fn open_process(id: ProcessId, mode: u32) -> Result<ProcessHandle> {
         let handle;
         unsafe {
             handle = processthreadsapi::OpenProcess(mode, false as i32, id.0);
             if handle == NULL {
-                return None;
+                return Err(Error::ProcessError("could not open process"));
             }
         }
-        Some(ProcessHandle(handle))
+        Ok(ProcessHandle(handle))
     }
 
-    pub fn open_process_read_info(id: ProcessId) -> Option<ProcessHandle> {
+    pub fn open_process_read_info(id: ProcessId) -> Result<ProcessHandle> {
         Self::open_process(id, PROCESS_QUERY_INFORMATION | PROCESS_VM_READ)
     }
 
-    pub fn get_name(&self) -> String {
+    pub fn get_name(&self) -> Result<String> {
         let name;
         unsafe {
             let mut module = mem::uninitialized();
             let mut bytes_needed = mem::uninitialized();
             let result = psapi::EnumProcessModules(self.0, &mut module as *mut HMODULE, mem::size_of::<HMODULE>() as u32, &mut bytes_needed as *mut u32);
             if result == 0 {
-                panic!("Error in EnumProcessModules");
+                Err(Error::ProcessError("error in EnumProcessModules"));
             }
             let mut name_buffer = [0i8; MAX_PATH];
             let bytes_in_str = psapi::GetModuleBaseNameA(self.0, module, &mut name_buffer[0] as *mut i8, MAX_PATH as u32);
             let name_buffer: [u8; MAX_PATH] = mem::transmute(name_buffer);
-            name = CStr::from_bytes_with_nul(&name_buffer[.. bytes_in_str as usize + 1]).unwrap().to_str().unwrap().to_string();
+            name = CStr::from_bytes_with_nul(&name_buffer[.. bytes_in_str as usize + 1])
+                .map_err(|_| Error::ProcessError("error converting process name"))?
+                .to_str()
+                .map_err(|_| Error::ProcessError("error converting process name"))?
+                .to_string();
         }
-        name
+        Ok(name)
     }
 
-    pub fn from_name(name: &str) -> Option<ProcessHandle> {
-        for pid in ProcessIterator::new() {
-            if let Some(handle) = ProcessHandle::open_process_read_info(pid) {
-                let process_name = handle.get_name();
+    pub fn from_name(name: &str) -> Result<Option<ProcessHandle>> {
+        for pid in ProcessIterator::new()? {
+            if let Ok(process_name) = ProcessHandle::open_process_read_info(pid).and_then(|h| h.get_name()) {
                 if &process_name == name {
-                    return Some(handle)
+                    return Ok(Some(handle))
                 }
             }
         }
-        None
+        Ok(None)
     }
 
     pub fn read_data(&self, address: u64, buf: &mut [u8]) -> usize {
