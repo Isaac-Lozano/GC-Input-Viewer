@@ -21,6 +21,7 @@ pub struct AnalogConf {
 }
 
 #[derive(Clone, Copy, Debug, Deserialize)]
+#[serde(rename_all = "lowercase")]
 pub enum TriggerDirection {
     Up,
     Down,
@@ -72,6 +73,7 @@ impl ThemeConfiguration {
 }
 
 #[derive(Clone, Debug, Deserialize)]
+#[serde(rename_all = "lowercase")]
 pub enum InputSource {
     Dtm(String),
     Sa2(Option<String>),

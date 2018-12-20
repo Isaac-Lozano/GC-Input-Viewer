@@ -75,14 +75,14 @@ l_analog:
     dst:
     - 443
     - 51
-  direction: Down
+  direction: up
 r_analog:
   image:
     path: trigger_a.png
     dst:
     - 472
     - 51
-  direction: Down
+  direction: up
 l_digital:
   path: trigger_d.png
   dst:
