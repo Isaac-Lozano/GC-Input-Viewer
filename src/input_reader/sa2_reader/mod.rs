@@ -38,7 +38,10 @@ impl Sa2Reader {
 
 impl InputReader for Sa2Reader {
     fn read_next_input(&mut self) -> Result<ControllerState> {
-        while self.phandle.is_none() {
+        let mut controller_state = ControllerState::default();
+
+        if self.phandle.is_none() {
+            thread::sleep(Duration::from_secs(1));
             self.phandle = ProcessHandle::from_name_filter(|pname| {
                 if let Some(ref name) = self.exe_name {
                     pname == *name
@@ -47,7 +50,7 @@ impl InputReader for Sa2Reader {
                     pname.to_lowercase() == SONIC_2_APP_EXE
                 }
             })?;
-            thread::sleep(Duration::from_secs(1));
+            return Ok(controller_state);
         }
 
         thread::sleep(Duration::from_micros(1000000 / 120));
@@ -57,7 +60,6 @@ impl InputReader for Sa2Reader {
         let joy_x = phandle.read_i32(JOY_X_ADDR)? + 0x80;
         let joy_y = phandle.read_i32(JOY_Y_ADDR)? + 0x80;
 
-        let mut controller_state = ControllerState::default();
         controller_state.left = buttons & 0x0001 != 0;
         controller_state.right = buttons & 0x0002 != 0;
         controller_state.down = buttons & 0x0004 != 0;
