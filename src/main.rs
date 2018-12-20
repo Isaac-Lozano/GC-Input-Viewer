@@ -17,7 +17,7 @@ use crate::controller_state::ControllerState;
 use crate::input_reader::InputReader;
 use crate::input_reader::dtm_reader::DtmReader;
 use crate::input_reader::serial_reader::SerialReader;
-//use crate::input_reader::sa2_reader::Sa2Reader;
+use crate::input_reader::sa2_reader::Sa2Reader;
 
 fn main() {
     // Read from configuration file.
@@ -30,7 +30,10 @@ fn main() {
             let dtm_reader = DtmReader::from_path(&path).unwrap_or_barf("Could not open dtm file");
             Box::new(dtm_reader)
         }
-        InputSource::Sa2(_exe_name) => unimplemented!(), //Box::new(Sa2Reader::new()),
+        InputSource::Sa2(_exe_name) => {
+            let sa2_reader = Sa2Reader::new().unwrap_or_barf("Could not open SA2 reader");
+            Box::new(sa2_reader)
+        }
         InputSource::Serial(path) => {
             let serial_reader = SerialReader::from_path(&path).unwrap_or_barf("Could not open serial port");
             Box::new(serial_reader)
