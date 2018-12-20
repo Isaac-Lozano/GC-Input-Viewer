@@ -16,6 +16,7 @@ pub struct Image<'a> {
 pub struct Analog<'a> {
     pub image: Image<'a>,
     pub range: (i32, i32),
+    pub line_from: Option<(i32, i32)>,
 }
 
 pub struct TextureCache<'a> {
@@ -66,6 +67,7 @@ impl<T> TextureCacheCreator<T> {
         Ok(Analog {
             image: image,
             range: conf.range,
+            line_from: conf.line_from,
         })
     }
 

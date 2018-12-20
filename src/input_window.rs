@@ -7,7 +7,7 @@ use sdl2::render::Canvas;
 use sdl2::event::Event;
 use sdl2::video::Window;
 use sdl2::pixels::Color;
-use sdl2::rect::Rect;
+use sdl2::rect::{Rect, Point};
 use sdl2::Sdl;
 
 use crate::texture_cache::{CanvasExt, TextureCache, Image, Analog};
@@ -50,12 +50,16 @@ impl InputWindow {
     }
 
     fn draw_analog(&mut self, analog: &Analog, position: (u8, u8)) -> Result<()> {
-        let xoffset = ((position.0 as f32 / 256.0) * 2.0 * analog.range.0 as f32) as i32;
-        let yoffset = ((position.1 as f32 / 256.0) * 2.0 * analog.range.1 as f32) as i32;
+        let xoffset = ((position.0 as f32 / 256.0) * 2.0 * analog.range.0 as f32) as i32 - analog.range.0;
+        let yoffset = analog.range.1 - ((position.1 as f32 / 256.0) * 2.0 * analog.range.1 as f32) as i32;
 
         let mut dst = analog.image.dst.clone();
-        dst.offset(xoffset - analog.range.0, analog.range.1 - yoffset);
+        dst.offset(xoffset, yoffset);
 
+        if let Some((x, y)) = analog.line_from {
+            self.canvas.set_draw_color(Color::RGB(0, 0, 0));
+            self.canvas.draw_line(Point::new(x, y), Point::new(x + xoffset, y + yoffset))?;
+        }
         self.canvas.copy(&analog.image.tex, None, dst)?;
         Ok(())
     }

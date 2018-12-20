@@ -17,6 +17,7 @@ pub struct ImageConf {
 pub struct AnalogConf {
     pub image: ImageConf,
     pub range: (i32, i32),
+    pub line_from: Option<(i32, i32)>,
 }
 
 #[derive(Clone, Debug, Deserialize)]
