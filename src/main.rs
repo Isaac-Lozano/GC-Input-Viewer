@@ -20,8 +20,6 @@ use crate::input_reader::serial_reader::SerialReader;
 #[cfg(windows)]
 use crate::input_reader::sa2_reader::Sa2Reader;
 
-const SONIC_ADVENTURE_2_EXE: &'static str = "sonic2App.exe";
-
 fn main() {
     // Print out version info.
     println!("GC Input Viewer by OnVar.");
@@ -73,8 +71,7 @@ fn get_input(input: InputSource) -> Box<dyn InputReader> {
             let dtm_reader = DtmReader::from_path(&path).unwrap_or_barf("Could not open dtm file");
             Box::new(dtm_reader)
         }
-        InputSource::Sa2(exe_name_opt) => {
-            let exe_name = exe_name_opt.unwrap_or(SONIC_ADVENTURE_2_EXE.into());
+        InputSource::Sa2(exe_name) => {
             let sa2_reader = Sa2Reader::new(exe_name).unwrap_or_barf("Could not open SA2 reader");
             Box::new(sa2_reader)
         }

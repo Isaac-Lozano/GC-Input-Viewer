@@ -6,7 +6,7 @@ use std::time::Duration;
 use crate::controller_state::ControllerState;
 use crate::error::Result;
 use crate::input_reader::InputReader;
-use crate::input_reader::sa2_reader::process_reader::ProcessHandle;
+use crate::input_reader::sa2_reader::process_reader::{ProcessHandle, ProcessIterator};
 
 const BUTTON_ADDR: u64 = 0x0000000001A52C4C;
 const JOY_X_ADDR: u64 = 0x0000000001A52C50;
@@ -14,12 +14,19 @@ const JOY_Y_ADDR: u64 = 0x0000000001A52C54;
 
 pub struct Sa2Reader {
     phandle: Option<ProcessHandle>,
-    exe_name: String,
+    exe_name: Option<String>,
 }
 
 impl Sa2Reader {
-    pub fn new(exe_name: String) -> Result<Sa2Reader> {
-        let phandle = ProcessHandle::from_name(&exe_name)?;
+    pub fn new(exe_name: Option<String>) -> Result<Sa2Reader> {
+        let phandle = ProcessHandle::from_name_filter(|pname| {
+            if let Some(ref name) = exe_name {
+                pname == *name
+            }
+            else {
+                pname == "sonic2App.exe" || pname == "sonic2App.exe"
+            }
+        })?;
 
         Ok(Sa2Reader {
             phandle: phandle,
@@ -31,7 +38,14 @@ impl Sa2Reader {
 impl InputReader for Sa2Reader {
     fn read_next_input(&mut self) -> Result<ControllerState> {
         while self.phandle.is_none() {
-            self.phandle = ProcessHandle::from_name(&self.exe_name)?;
+            self.phandle = ProcessHandle::from_name_filter(|pname| {
+                if let Some(ref name) = self.exe_name {
+                    pname == *name
+                }
+                else {
+                    pname == "sonic2App.exe" || pname == "sonic2App.exe"
+                }
+            })?;
             thread::sleep(Duration::from_secs(1));
         }
 

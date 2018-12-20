@@ -54,17 +54,21 @@ impl ProcessHandle {
         Ok(name)
     }
 
-    pub fn from_name(name: &str) -> Result<Option<ProcessHandle>> {
-        for pid in ProcessIterator::new()? {
-            if let Ok(handle) = ProcessHandle::open_process_read_info(pid) {
-                if let Ok(process_name) = handle.get_name() {
-                    if &process_name == name {
-                        return Ok(Some(handle))
-                    }
+    pub fn from_name_filter<F>(mut filter: F) -> Result<Option<ProcessHandle>>
+        where F: FnMut(String) -> bool,
+    {
+        let mut processes = ProcessIterator::new()?
+            .filter_map(|pid| {
+                let handle = ProcessHandle::open_process_read_info(pid).ok()?;
+                let name = handle.get_name().ok()?;
+                if filter(name) {
+                    Some(handle)
                 }
-            }
-        }
-        Ok(None)
+                else {
+                    None
+                }
+            });
+        Ok(processes.next())
     }
 
     pub fn read_data(&self, address: u64, buf: &mut [u8]) -> Result<usize> {
