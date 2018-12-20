@@ -5,7 +5,7 @@ use sdl2::image::LoadTexture;
 use sdl2::rect::Rect;
 use sdl2::video::{Window, WindowContext};
 
-use crate::configuration::{ThemeConfiguration, ImageConf, AnalogConf};
+use crate::configuration::{ThemeConfiguration, ImageConf, AnalogConf, TriggerConf, TriggerDirection};
 use crate::error::Result;
 
 pub struct Image<'a> {
@@ -17,6 +17,11 @@ pub struct Analog<'a> {
     pub image: Image<'a>,
     pub range: (i32, i32),
     pub line_from: Option<(i32, i32)>,
+}
+
+pub struct Trigger<'a> {
+    pub image: Image<'a>,
+    pub direction: TriggerDirection,
 }
 
 pub struct TextureCache<'a> {
@@ -32,8 +37,8 @@ pub struct TextureCache<'a> {
     pub start: Option<Image<'a>>,
     pub analog: Option<Analog<'a>>,
     pub c: Option<Analog<'a>>,
-    pub l_analog: Option<Image<'a>>,
-    pub r_analog: Option<Image<'a>>,
+    pub l_analog: Option<Trigger<'a>>,
+    pub r_analog: Option<Trigger<'a>>,
     pub l_digital: Option<Image<'a>>,
     pub r_digital: Option<Image<'a>>,
     pub z: Option<Image<'a>>,
@@ -68,6 +73,15 @@ impl<T> TextureCacheCreator<T> {
             image: image,
             range: conf.range,
             line_from: conf.line_from,
+        })
+    }
+
+    fn read_trigger<'a>(&'a self, conf: &TriggerConf) -> Result<Trigger<'a>> {
+        let image = self.read_image(&conf.image)?;
+
+        Ok(Trigger {
+            image: image,
+            direction: conf.direction,
         })
     }
 
@@ -118,11 +132,11 @@ impl<T> TextureCacheCreator<T> {
             None => None,
         };
         let l_analog = match conf.l_analog.as_ref() {
-            Some(image) => Some(self.read_image(image)?),
+            Some(trigger) => Some(self.read_trigger(trigger)?),
             None => None,
         };
         let r_analog = match conf.r_analog.as_ref() {
-            Some(image) => Some(self.read_image(image)?),
+            Some(trigger) => Some(self.read_trigger(trigger)?),
             None => None,
         };
         let l_digital = match conf.l_digital.as_ref() {

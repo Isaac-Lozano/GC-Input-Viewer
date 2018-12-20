@@ -20,6 +20,20 @@ pub struct AnalogConf {
     pub line_from: Option<(i32, i32)>,
 }
 
+#[derive(Clone, Copy, Debug, Deserialize)]
+pub enum TriggerDirection {
+    Up,
+    Down,
+    Left,
+    Right,
+}
+
+#[derive(Clone, Debug, Deserialize)]
+pub struct TriggerConf {
+    pub image: ImageConf,
+    pub direction: TriggerDirection,
+}
+
 #[derive(Clone, Debug, Deserialize)]
 pub struct ThemeConfiguration {
     pub size: (u32, u32),
@@ -35,8 +49,8 @@ pub struct ThemeConfiguration {
     pub start: Option<ImageConf>,
     pub analog: Option<AnalogConf>,
     pub c: Option<AnalogConf>,
-    pub l_analog: Option<ImageConf>,
-    pub r_analog: Option<ImageConf>,
+    pub l_analog: Option<TriggerConf>,
+    pub r_analog: Option<TriggerConf>,
     pub l_digital: Option<ImageConf>,
     pub r_digital: Option<ImageConf>,
     pub z: Option<ImageConf>,

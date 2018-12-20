@@ -10,9 +10,9 @@ use sdl2::pixels::Color;
 use sdl2::rect::{Rect, Point};
 use sdl2::Sdl;
 
-use crate::texture_cache::{CanvasExt, TextureCache, Image, Analog};
+use crate::texture_cache::{CanvasExt, TextureCache, Image, Analog, Trigger};
 use crate::controller_state::ControllerState;
-use crate::configuration::ThemeConfiguration;
+use crate::configuration::{ThemeConfiguration, TriggerDirection};
 use crate::error::{Error, Result};
 
 pub struct InputWindow {
@@ -64,17 +64,51 @@ impl InputWindow {
         Ok(())
     }
 
-    fn draw_trigger(&mut self, image: &Image, value: u8) -> Result<()> {
-        let tex_info = image.tex.query();
-        let src_h = ((tex_info.height as f32 * value as f32) / 256.0) as u32;
-        let dst_h = ((image.dst.height() as f32 * value as f32) / 256.0) as u32;
+    fn draw_trigger(&mut self, trigger: &Trigger, value: u8) -> Result<()> {
+        let tex_info = trigger.image.tex.query();
 
-        let src = Rect::new(0, (tex_info.height - src_h) as i32, tex_info.width, src_h);
-        let mut dst = image.dst;
-        dst.set_height(dst_h);
-        dst.offset(0, (image.dst.height() - dst_h) as i32);
+        let (src, dst) = match trigger.direction {
+            TriggerDirection::Up => {
+                let src_h = ((tex_info.height as f32 * value as f32) / 256.0) as u32;
+                let dst_h = ((trigger.image.dst.height() as f32 * value as f32) / 256.0) as u32;
 
-        self.canvas.copy(&image.tex, src, dst)?;
+                let src = Rect::new(0, (tex_info.height - src_h) as i32, tex_info.width, src_h);
+                let mut dst = trigger.image.dst;
+                dst.set_height(dst_h);
+                dst.offset(0, (trigger.image.dst.height() - dst_h) as i32);
+                (src, dst)
+            }
+            TriggerDirection::Down => {
+                let src_h = ((tex_info.height as f32 * value as f32) / 256.0) as u32;
+                let dst_h = ((trigger.image.dst.height() as f32 * value as f32) / 256.0) as u32;
+
+                let src = Rect::new(0, 0, tex_info.width, src_h);
+                let mut dst = trigger.image.dst;
+                dst.set_height(dst_h);
+                (src, dst)
+            }
+            TriggerDirection::Left => {
+                let src_w = ((tex_info.width as f32 * value as f32) / 256.0) as u32;
+                let dst_w = ((trigger.image.dst.width() as f32 * value as f32) / 256.0) as u32;
+
+                let src = Rect::new((tex_info.width - src_w) as i32, 0, src_w, tex_info.height);
+                let mut dst = trigger.image.dst;
+                dst.set_width(dst_w);
+                dst.offset((trigger.image.dst.width() - dst_w) as i32, 0);
+                (src, dst)
+            }
+            TriggerDirection::Right => {
+                let src_w = ((tex_info.width as f32 * value as f32) / 256.0) as u32;
+                let dst_w = ((trigger.image.dst.width() as f32 * value as f32) / 256.0) as u32;
+
+                let src = Rect::new(0, 0, src_w, tex_info.height);
+                let mut dst = trigger.image.dst;
+                dst.set_width(dst_w);
+                (src, dst)
+            }
+        };
+
+        self.canvas.copy(&trigger.image.tex, src, dst)?;
         Ok(())
     }
 

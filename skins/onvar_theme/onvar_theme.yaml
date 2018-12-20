@@ -70,15 +70,19 @@ c:
   - 34
   - 34
 l_analog:
-  path: trigger_a.png
-  dst:
-  - 443
-  - 51
+  image:
+    path: trigger_a.png
+    dst:
+    - 443
+    - 51
+  direction: Down
 r_analog:
-  path: trigger_a.png
-  dst:
-  - 472
-  - 51
+  image:
+    path: trigger_a.png
+    dst:
+    - 472
+    - 51
+  direction: Down
 l_digital:
   path: trigger_d.png
   dst:
