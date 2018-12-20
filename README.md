@@ -23,6 +23,7 @@ The theme file is more involved. It contains the following fields.
   * y
 * `a` (optional)
   * `path`
+    * path
   * `dst`
     * x
     * y
@@ -54,6 +55,7 @@ The theme file is more involved. It contains the following fields.
 * `analog` (optional)
   * `image`
     * `path`
+      * path
     * `dst`
       * x
       * y
