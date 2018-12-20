@@ -40,7 +40,7 @@ impl ProcessHandle {
             let mut bytes_needed = mem::uninitialized();
             let result = psapi::EnumProcessModules(self.0, &mut module as *mut HMODULE, mem::size_of::<HMODULE>() as u32, &mut bytes_needed as *mut u32);
             if result == 0 {
-                Err(Error::ProcessError("error in EnumProcessModules"));
+                return Err(Error::ProcessError("error in EnumProcessModules"));
             }
             let mut name_buffer = [0i8; MAX_PATH];
             let bytes_in_str = psapi::GetModuleBaseNameA(self.0, module, &mut name_buffer[0] as *mut i8, MAX_PATH as u32);
@@ -56,16 +56,18 @@ impl ProcessHandle {
 
     pub fn from_name(name: &str) -> Result<Option<ProcessHandle>> {
         for pid in ProcessIterator::new()? {
-            if let Ok(process_name) = ProcessHandle::open_process_read_info(pid).and_then(|h| h.get_name()) {
-                if &process_name == name {
-                    return Ok(Some(handle))
+            if let Ok(handle) = ProcessHandle::open_process_read_info(pid) {
+                if let Ok(process_name) = handle.get_name() {
+                    if &process_name == name {
+                        return Ok(Some(handle))
+                    }
                 }
             }
         }
         Ok(None)
     }
 
-    pub fn read_data(&self, address: u64, buf: &mut [u8]) -> usize {
+    pub fn read_data(&self, address: u64, buf: &mut [u8]) -> Result<usize> {
         let mut bytes_read;
         unsafe {
             bytes_read = mem::uninitialized();
@@ -73,15 +75,15 @@ impl ProcessHandle {
             let buf_addr = buf.as_mut_ptr() as *mut c_void;
             let result = memoryapi::ReadProcessMemory(self.0, address, buf_addr, buf.len(), &mut bytes_read as *mut usize);
             if result == 0 {
-                panic!("Error in ReadProcessMemory");
+                return Err(Error::ProcessError("Error in ReadProcessMemory"));
             }
         }
-        bytes_read
+        Ok(bytes_read)
     }
 
-    pub fn read_i32(&self, address: u64) -> i32 {
+    pub fn read_i32(&self, address: u64) -> Result<i32> {
         let mut buf = [0; 4];
-        let bytes_read = self.read_data(address, &mut buf);
+        let bytes_read = self.read_data(address, &mut buf)?;
         if bytes_read != 4 {
             panic!("Not enough bytes read");
         }
@@ -93,12 +95,12 @@ impl ProcessHandle {
         value |= buf[1] as i32;
         value <<= 8;
         value |= buf[0] as i32;
-        value
+        Ok(value)
     }
 
-    pub fn read_u32(&self, address: u64) -> u32 {
+    pub fn read_u32(&self, address: u64) -> Result<u32> {
         let mut buf = [0; 4];
-        let bytes_read = self.read_data(address, &mut buf);
+        let bytes_read = self.read_data(address, &mut buf)?;
         if bytes_read != 4 {
             panic!("Not enough bytes read");
         }
@@ -110,7 +112,7 @@ impl ProcessHandle {
         value |= buf[1] as u32;
         value <<= 8;
         value |= buf[0] as u32;
-        value
+        Ok(value)
     }
 }
 
@@ -123,7 +125,7 @@ pub struct ProcessIterator {
 }
 
 impl ProcessIterator {
-    pub fn new() -> ProcessIterator {
+    pub fn new() -> Result<ProcessIterator> {
         let mut buffer = vec![0; PROCESS_BUFFER_LEN];
 
         unsafe {
@@ -131,14 +133,14 @@ impl ProcessIterator {
             let mut returned_bytes = 0u32;
             let result = psapi::EnumProcesses(buf_ptr, (PROCESS_BUFFER_LEN * mem::size_of::<u32>()) as u32, &mut returned_bytes as *mut u32);
             if result == 0 {
-                panic!("Error in EnumProcess");
+                return Err(Error::ProcessError("Error in EnumProcess"));
             }
             buffer.set_len(returned_bytes as usize / mem::size_of::<u32>());
         }
 
-        ProcessIterator {
+        Ok(ProcessIterator {
             iter: buffer.into_iter(),
-        }
+        })
     }
 }
 
