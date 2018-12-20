@@ -1,3 +1,5 @@
+#![windows_subsystem = "windows"]
+
 mod input_window;
 mod configuration;
 mod texture_cache;
