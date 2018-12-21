@@ -14,7 +14,18 @@ There are currently three different input methods.
 * `serial` reads from the COM port specified as its argument.
 * `dtm` reads from a dtm file specified as its argument.
 * `sa2` reads from a running instance of SA2.
-  * If this method doesn't work, you can specify a custom exe to attach to.
+
+In the case of `sa2`, if you leave the field empty, then it will use the default exe name to look for.
+```yaml
+input:
+  sa2:
+```
+
+If this doesn't work for you, you can find the name of the exe your version uses and specify it in the configuration file.
+```yaml
+input:
+  sa2: custom_sonic_2_app_name.exe
+```
 
 ## Themes
 The theme file is more involved. It contains the following fields.
