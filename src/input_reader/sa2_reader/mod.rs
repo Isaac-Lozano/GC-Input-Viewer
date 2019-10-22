@@ -12,6 +12,10 @@ const SONIC_2_APP_EXE: &'static str = "sonic2app.exe";
 const BUTTON_ADDR: u64 = 0x0000000001A52C4C;
 const JOY_X_ADDR: u64 = 0x0000000001A52C50;
 const JOY_Y_ADDR: u64 = 0x0000000001A52C54;
+const C_X_ADDR: u64 = 0x0000000001A52C58;
+const C_Y_ADDR: u64 = 0x0000000001A52C5C;
+const L_ANALOG_ADDR: u64 = 0x0000000001A52C60;
+const R_ANALOG_ADDR: u64 = 0x0000000001A52C64;
 
 pub struct Sa2Reader {
     phandle: Option<ProcessHandle>,
@@ -59,6 +63,10 @@ impl InputReader for Sa2Reader {
         let buttons = phandle.read_u32(BUTTON_ADDR)?;
         let joy_x = phandle.read_i32(JOY_X_ADDR)? + 0x80;
         let joy_y = phandle.read_i32(JOY_Y_ADDR)? + 0x80;
+        let c_x = phandle.read_i32(C_X_ADDR)? + 0x80;
+        let c_y = phandle.read_i32(C_Y_ADDR)? + 0x80;
+        let l_analog = phandle.read_i32(L_ANALOG_ADDR)?;
+        let r_analog = phandle.read_i32(R_ANALOG_ADDR)?;
 
         controller_state.left = buttons & 0x0001 != 0;
         controller_state.right = buttons & 0x0002 != 0;
@@ -72,6 +80,9 @@ impl InputReader for Sa2Reader {
         controller_state.y = buttons & 0x0800 != 0;
         controller_state.start = buttons & 0x1000 != 0;
         controller_state.analog = (joy_x as u8, joy_y as u8);
+        controller_state.c = (c_x as u8, c_y as u8);
+        controller_state.l_analog = l_analog as u8;
+        controller_state.r_analog = r_analog as u8;
 
         Ok(controller_state)
     }
