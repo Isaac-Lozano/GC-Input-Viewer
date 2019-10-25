@@ -67,6 +67,11 @@ impl InputWindow {
     fn draw_trigger(&mut self, trigger: &Trigger, value: u8) -> Result<()> {
         let tex_info = trigger.image.tex.query();
 
+        // Hacky fix to value 0 still showing up
+        if value == 0 {
+            return Ok(());
+        }
+
         let (src, dst) = match trigger.direction {
             TriggerDirection::Up => {
                 let src_h = ((tex_info.height as f32 * value as f32) / 256.0) as u32;
