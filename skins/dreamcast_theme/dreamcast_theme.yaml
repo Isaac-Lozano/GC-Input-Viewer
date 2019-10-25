@@ -1,0 +1,76 @@
+size:
+- 512
+- 256
+background:
+  path: background.png
+  dst:
+  - 0
+  - 0
+a:
+  path: a.png
+  dst:
+  - 387
+  - 130
+b:
+  path: b.png
+  dst:
+  - 442
+  - 75
+x:
+  path: x.png
+  dst:
+  - 332
+  - 75
+y:
+  path: y.png
+  dst:
+  - 387
+  - 20
+up:
+  path: up.png
+  dst:
+  - 239
+  - 50
+down:
+  path: down.png
+  dst:
+  - 239
+  - 100
+left:
+  path: left.png
+  dst:
+  - 206
+  - 83
+right:
+  path: right.png
+  dst:
+  - 256
+  - 83
+start:
+  path: start.png
+  dst:
+  - 227
+  - 188
+analog:
+  image:
+    path: analog.png
+    dst:
+    - 90
+    - 90
+  range:
+  - 80
+  - 80
+l_analog:
+  image:
+    path: trigger.png
+    dst:
+    - 20
+    - 216
+  direction: left
+r_analog:
+  image:
+    path: trigger.png
+    dst:
+    - 332
+    - 216
+  direction: right
