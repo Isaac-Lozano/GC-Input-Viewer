@@ -1,4 +1,4 @@
-use std::io::{Read, BufRead, BufReader};
+use std::io::{Read, BufRead, BufReader, ErrorKind};
 use std::time::Duration;
 
 use serialport::{SerialPort, SerialPortSettings, DataBits, FlowControl, Parity, StopBits};
@@ -37,7 +37,14 @@ impl<R> InputReader for SerialReader<R>
 
         loop {
             buf.clear();
-            self.port.read_line(&mut buf)?;
+            match self.port.read_line(&mut buf) {
+                Err(e) => {
+                    if let ErrorKind::TimedOut = e.kind() {
+                        continue;
+                    }
+                }
+                Ok(_) => {}
+            }
             let mut reader = StateReader::new(buf.chars());
             if let Some(state) = reader.read_state() {
                 return Ok(state);
@@ -85,8 +92,6 @@ impl<I> StateReader<I>
 
     fn read_state(&mut self) -> Option<ControllerState> {
         let mut state = ControllerState::default();
-        self.iter.next()?;
-        self.iter.next()?;
         self.iter.next()?;
         state.start = self.read_bool()?;
         state.y = self.read_bool()?;
