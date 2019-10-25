@@ -38,12 +38,42 @@ impl Sa2Reader {
             exe_name: exe_name,
         })
     }
+
+    fn get_controller_state(&self) -> Result<ControllerState> {
+        let mut controller_state = ControllerState::default();
+
+        if let Some(phandle) = self.phandle.as_ref() {
+            let buttons = phandle.read_u32(BUTTON_ADDR)?;
+            let joy_x = phandle.read_i32(JOY_X_ADDR)? + 0x80;
+            let joy_y = phandle.read_i32(JOY_Y_ADDR)? + 0x80;
+            let c_x = phandle.read_i32(C_X_ADDR)? + 0x80;
+            let c_y = phandle.read_i32(C_Y_ADDR)? + 0x80;
+            let l_analog = phandle.read_i32(L_ANALOG_ADDR)?;
+            let r_analog = phandle.read_i32(R_ANALOG_ADDR)?;
+
+            controller_state.left = buttons & 0x0001 != 0;
+            controller_state.right = buttons & 0x0002 != 0;
+            controller_state.down = buttons & 0x0004 != 0;
+            controller_state.up = buttons & 0x0008 != 0;
+            controller_state.r_digital = buttons & 0x0020 != 0;
+            controller_state.l_digital = buttons & 0x0040 != 0;
+            controller_state.a = buttons & 0x0100 != 0;
+            controller_state.b = buttons & 0x0200 != 0;
+            controller_state.x = buttons & 0x0400 != 0;
+            controller_state.y = buttons & 0x0800 != 0;
+            controller_state.start = buttons & 0x1000 != 0;
+            controller_state.analog = (joy_x as u8, joy_y as u8);
+            controller_state.c = (c_x as u8, c_y as u8);
+            controller_state.l_analog = l_analog as u8;
+            controller_state.r_analog = r_analog as u8;
+        }
+
+        Ok(controller_state)
+    }
 }
 
 impl InputReader for Sa2Reader {
     fn read_next_input(&mut self) -> Result<ControllerState> {
-        let mut controller_state = ControllerState::default();
-
         if self.phandle.is_none() {
             thread::sleep(Duration::from_secs(1));
             self.phandle = ProcessHandle::from_name_filter(|pname| {
@@ -54,36 +84,17 @@ impl InputReader for Sa2Reader {
                     pname.to_lowercase() == SONIC_2_APP_EXE
                 }
             })?;
-            return Ok(controller_state);
+            return Ok(ControllerState::default());
         }
 
         thread::sleep(Duration::from_micros(1000000 / 120));
-        let phandle = self.phandle.as_ref().unwrap();
 
-        let buttons = phandle.read_u32(BUTTON_ADDR)?;
-        let joy_x = phandle.read_i32(JOY_X_ADDR)? + 0x80;
-        let joy_y = phandle.read_i32(JOY_Y_ADDR)? + 0x80;
-        let c_x = phandle.read_i32(C_X_ADDR)? + 0x80;
-        let c_y = phandle.read_i32(C_Y_ADDR)? + 0x80;
-        let l_analog = phandle.read_i32(L_ANALOG_ADDR)?;
-        let r_analog = phandle.read_i32(R_ANALOG_ADDR)?;
-
-        controller_state.left = buttons & 0x0001 != 0;
-        controller_state.right = buttons & 0x0002 != 0;
-        controller_state.down = buttons & 0x0004 != 0;
-        controller_state.up = buttons & 0x0008 != 0;
-        controller_state.r_digital = buttons & 0x0020 != 0;
-        controller_state.l_digital = buttons & 0x0040 != 0;
-        controller_state.a = buttons & 0x0100 != 0;
-        controller_state.b = buttons & 0x0200 != 0;
-        controller_state.x = buttons & 0x0400 != 0;
-        controller_state.y = buttons & 0x0800 != 0;
-        controller_state.start = buttons & 0x1000 != 0;
-        controller_state.analog = (joy_x as u8, joy_y as u8);
-        controller_state.c = (c_x as u8, c_y as u8);
-        controller_state.l_analog = l_analog as u8;
-        controller_state.r_analog = r_analog as u8;
-
-        Ok(controller_state)
+        match self.get_controller_state() {
+            Ok(controller_state) => Ok(controller_state),
+            Err(_) => {
+                self.phandle = None;
+                Ok(ControllerState::default())
+            }
+        }
     }
 }
