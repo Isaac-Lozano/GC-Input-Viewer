@@ -1,6 +1,6 @@
 [package]
 name = "gc_input_viewer"
-version = "0.3.0"
+version = "0.3.1"
 authors = ["Isaac Lozano <109lozanoi@gmail.com>"]
 edition = "2018"
 
