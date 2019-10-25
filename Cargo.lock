@@ -84,7 +84,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "gc_input_viewer"
-version = "0.3.1"
+version = "0.3.2"
 dependencies = [
  "dtm2txt 0.2.0 (git+https://github.com/Isaac-Lozano/dtm2txt.git)",
  "sdl2 0.31.0 (registry+https://github.com/rust-lang/crates.io-index)",
